@@ -4,3 +4,6 @@ manifests:
     platform:
       architecture: arm
       os: linux
+
+
+#TODO: armv6l, armv7l, aarch64

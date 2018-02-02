@@ -2,7 +2,7 @@
 
 ## Overview
 This is a fork of the Git repo of the Docker [official image](https://docs.docker.com/docker-hub/official_repos/) for
-[mysql](https://registry.hub.docker.com/_/mysql/). See [the Docker Hub page](https://registry.hub.docker.com/_/mysql/)
+[Mysql](https://registry.hub.docker.com/_/mysql/). See [the Docker Hub page](https://registry.hub.docker.com/_/mysql/)
 for the full readme on how to use this Docker image and for information regarding contributing and issues.
 
 The goal of this fork was to build an ARM (arm32v6 and arm32v7) compliant images, as the official 'mysql' don't (currently) support such
@@ -22,7 +22,7 @@ Image: biarms/mysql:5.7
  * Supports: arm/linux
 ```
 
-Notices that these images are build on top of official docker images (debian for mysql-server 5.5 and ubuntu for mysql-server 5.7), and offer the same 'docker-entry-point' functionality as the official images (including the MYSQL_ROOT_PASSWORD_FILE usefull for docker swarm). By the way, the docker-entry-point.sh file embedded in this image is directly downloaded from the official mysql docker repository. 
+Notices that these images are build on top of official docker images (resin/raspbian for mysql-server 5.5 and ubuntu for mysql-server 5.7), and offer the same 'docker-entry-point' functionality as the official images (including the MYSQL_ROOT_PASSWORD_FILE usefull for docker swarm). By the way, the docker-entry-point.sh file embedded in this image is directly downloaded from the official mysql docker repository.
 
 Conclusions: 
 - The 5.7 image was designed to be compliant with arm32v7, and therefore, should be able to run on Raspberry Pi (2 and 3), Odroid, Orange PI, etc. But NOT with a Raspberry Pi 1.
@@ -156,3 +156,6 @@ $ docker run --rm -it biarms/mysql:5.5 --version
 180201  0:48:16 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
 mysqld  Ver 5.5.59-0+deb8u1 for debian-linux-gnu on armv7l ((Debian))
 ```
+
+
+
