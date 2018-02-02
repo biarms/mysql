@@ -1,0 +1,6 @@
+image: biarms/mysql:5.7
+manifests:
+  - image: biarms/mysql:linux-arm-5.7
+    platform:
+      architecture: arm
+      os: linux

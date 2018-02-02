@@ -101,3 +101,5 @@ CMD ["mysqld"]
 # Changed from original: next line was added
 # (inspired by https://github.com/rothgar/rpi-wordpress/blob/master/mysql/Dockerfile)
 ADD my-small.cnf /etc/mysql/conf.d/
+
+RUN /usr/bin/mysql_install_db --user=mysql
