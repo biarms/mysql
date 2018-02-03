@@ -72,8 +72,8 @@ RUN { \
 	} | debconf-set-selections \
 # Changed from original - start: add tzdata package to fix a timezone blocking issue at startup
 # (according to https://serverfault.com/questions/511821/how-to-update-install-zoneinfo-timezone-database-on-centos)
-# Changed from original - end
 	&& apt-get update && apt-get install -y "mysql-server" tzdata && rm -rf /var/lib/apt/lists/* \
+# Changed from original - end
 	&& rm -rf /var/lib/mysql && mkdir -p /var/lib/mysql /var/run/mysqld \
 	&& chown -R mysql:mysql /var/lib/mysql /var/run/mysqld \
 # ensure that /var/run/mysqld (used for socket and lock files) is writable regardless of the UID our mysqld instance ends up having at runtime
@@ -87,19 +87,19 @@ RUN { \
 
 VOLUME /var/lib/mysql
 
-# Changed from original - start: next 3 lines result from a hack: download the official docker-entrypoint.sh file from official github repo
+# Changed from original - start: download the official docker-entrypoint.sh file from official github repo
 ADD https://raw.githubusercontent.com/docker-library/mysql/master/${MYSQL_MAJOR}/docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
  && chown mysql:mysql /usr/local/bin/docker-entrypoint.sh \
  && ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
-# Changed from original - end
+# Changed from original - end: download the official docker-entrypoint.sh file from official github repo
 # Changed from original - start: on ubuntu, /usr/local/bin is not in the path
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-# Changed from original - end
+# Changed from original - end: on ubuntu, /usr/local/bin is not in the path
 
 EXPOSE 3306
 CMD ["mysqld"]
 
 # Changed from original: next line was added
 # (inspired by https://github.com/rothgar/rpi-wordpress/blob/master/mysql/Dockerfile)
-ADD my-small.cnf /etc/mysql/conf.d/
+ADD my-small.cnf /etc/mysql/conf.d/my.cnf
