@@ -4,7 +4,7 @@ SHELL = bash
 
 #DOCKER_REGISTRY=''
 DOCKER_IMAGE_NAME=biarms/mysql
-DOCKER_IMAGE_TAGNAME=$(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):linux-arm-$(DOCKER_IMAGE_VERSION)
+DOCKER_IMAGE_TAGNAME=$(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):linux-$(ARCH)-$(DOCKER_IMAGE_VERSION)
 DOCKER_FILE=Dockerfile-$(DOCKER_IMAGE_VERSION)
 
 default: build test tag push
@@ -13,9 +13,17 @@ check:
 	@if [[ "$(DOCKER_IMAGE_VERSION)" == "" ]]; then \
 	    echo 'DOCKER_IMAGE_VERSION is $(DOCKER_IMAGE_VERSION) (MUST BE SET !)' && \
 	    echo 'Correct usage sample: ' && \
-	    echo '    DOCKER_IMAGE_VERSION=5.5 make ' && \
+	    echo '    ARCH=arm32v7 DOCKER_IMAGE_VERSION=5.5 make ' && \
 	    echo '    or ' && \
-        echo '    DOCKER_IMAGE_VERSION=5.7 make' && \
+        echo '    ARCH=arm64v8 DOCKER_IMAGE_VERSION=5.7 make' && \
+        exit 1; \
+	fi
+	@if [[ "$(ARCH)" == "" ]]; then \
+	    echo 'ARCH is $(ARCH) (MUST BE SET !)' && \
+	    echo 'Correct usage sample: ' && \
+	    echo '    ARCH=arm32v7 DOCKER_IMAGE_VERSION=5.5 make ' && \
+	    echo '    or ' && \
+        echo '    ARCH=arm64v8 DOCKER_IMAGE_VERSION=5.7 make' && \
         exit 1; \
 	fi
 	@which manifest-tool > /dev/null || (echo "Ensure that you've got the manifest-tool utility in your path. Could be downloaded from  https://github.com/estesp/manifest-tool/releases/download/" && exit 2)
@@ -59,13 +67,13 @@ push-manifest: check
 	# In the mean time, I use: https://github.com/estesp/manifest-tool
 	# sudo wget -O /usr/local/bin manifest-tool https://github.com/estesp/manifest-tool/releases/download/v0.7.0/manifest-tool-linux-armv7
 	# sudo chmod +x /usr/local/bin/manifest-tool
-	echo "image: $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)" > manifest.yaml
-	echo "manifests:" >> manifest.yaml
-	echo "  - image: $(DOCKER_REGISTRY)biarms/mysql:linux-arm-$(DOCKER_IMAGE_VERSION) " >> manifest.yaml
-	echo "    platform: " >> manifest.yaml
-	echo "      architecture: arm " >> manifest.yaml
-	echo "      os: linux " >> manifest.yaml
-	echo "   #TODO: armv6l, armv7l, aarch64" >> manifest.yaml
+	# echo "image: $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)" > manifest.yaml
+	# echo "manifests:" >> manifest.yaml
+	# echo "  - image: $(DOCKER_REGISTRY)biarms/mysql:linux-arm-$(DOCKER_IMAGE_VERSION) " >> manifest.yaml
+	# echo "    platform: " >> manifest.yaml
+	# echo "      architecture: arm " >> manifest.yaml
+	# echo "      os: linux " >> manifest.yaml
+	# echo "   #TODO: armv6l, armv7l, aarch64" >> manifest.yaml
 	manifest-tool push from-spec manifest.yaml
 	# rm manifest.yaml
 
