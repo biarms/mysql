@@ -5,7 +5,7 @@ SHELL = bash
 #DOCKER_REGISTRY=''
 DOCKER_IMAGE_NAME=biarms/mysql
 DOCKER_IMAGE_TAGNAME=$(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):linux-$(ARCH)-$(DOCKER_IMAGE_VERSION)
-DOCKER_FILE=Dockerfile-$(DOCKER_IMAGE_VERSION)
+DOCKER_FILE=Dockerfile-$(ARCH)-$(DOCKER_IMAGE_VERSION)
 
 default: build test tag push
 
@@ -67,13 +67,23 @@ push-manifest: check
 	# In the mean time, I use: https://github.com/estesp/manifest-tool
 	# sudo wget -O /usr/local/bin manifest-tool https://github.com/estesp/manifest-tool/releases/download/v0.7.0/manifest-tool-linux-armv7
 	# sudo chmod +x /usr/local/bin/manifest-tool
-	# echo "image: $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)" > manifest.yaml
-	# echo "manifests:" >> manifest.yaml
-	# echo "  - image: $(DOCKER_REGISTRY)biarms/mysql:linux-arm-$(DOCKER_IMAGE_VERSION) " >> manifest.yaml
-	# echo "    platform: " >> manifest.yaml
-	# echo "      architecture: arm " >> manifest.yaml
-	# echo "      os: linux " >> manifest.yaml
-	# echo "   #TODO: armv6l, armv7l, aarch64" >> manifest.yaml
+	echo "image: $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)" > manifest.yaml
+	echo "manifests:" >> manifest.yaml
+	#echo "  - image: $(DOCKER_REGISTRY)biarms/mysql:linux-arm32v6-$(DOCKER_IMAGE_VERSION) " >> manifest.yaml
+	#echo "    platform: " >> manifest.yaml
+	#echo "      os: linux " >> manifest.yaml
+	#echo "      architecture: arm " >> manifest.yaml
+	#echo "      variant: v6 " >> manifest.yaml
+	#echo "  - image: $(DOCKER_REGISTRY)biarms/mysql:linux-arm32v7-$(DOCKER_IMAGE_VERSION) " >> manifest.yaml
+	#echo "    platform: " >> manifest.yaml
+	#echo "      os: linux " >> manifest.yaml
+	#echo "      architecture: arm " >> manifest.yaml
+	#echo "      variant: v7 " >> manifest.yaml
+	echo "  - image: $(DOCKER_REGISTRY)biarms/mysql:linux-arm64v8-$(DOCKER_IMAGE_VERSION) " >> manifest.yaml
+	echo "    platform: " >> manifest.yaml
+	echo "      os: linux " >> manifest.yaml
+	echo "      architecture: arm64 " >> manifest.yaml
+	echo "      variant: v8 " >> manifest.yaml
 	manifest-tool push from-spec manifest.yaml
 	# rm manifest.yaml
 
