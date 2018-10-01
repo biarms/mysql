@@ -97,12 +97,12 @@ push-manifest-with-manifest-tool:
 	# rm manifest.yaml
 
 push-manifest:
-	docker manifest create biarms/mysql:5.5 biarms/mysql:5.5.61-linux-aarch64
+	docker manifest create --amend biarms/mysql:5.5 biarms/mysql:5.5.60-linux-armv6l biarms/mysql:5.5.61-linux-armv7l biarms/mysql:5.5.61-linux-aarch64
 	docker manifest annotate biarms/mysql:5.5 biarms/mysql:5.5.60-linux-armv6l  --os linux --arch arm   --variant v6
 	docker manifest annotate biarms/mysql:5.5 biarms/mysql:5.5.61-linux-armv7l  --os linux --arch arm   --variant v7
 	docker manifest annotate biarms/mysql:5.5 biarms/mysql:5.5.61-linux-aarch64 --os linux --arch arm64 --variant v8
 	docker manifest push biarms/mysql:5.5
-	docker manifest create biarms/mysql biarms/mysql:5.5.61-linux-aarch64
+	docker manifest create --amend biarms/mysql biarms/mysql:5.5.60-linux-armv6l biarms/mysql:5.5.61-linux-armv7l biarms/mysql:5.5.61-linux-aarch64
 	docker manifest annotate biarms/mysql biarms/mysql:5.5.60-linux-armv6l  --os linux --arch arm   --variant v6
 	docker manifest annotate biarms/mysql biarms/mysql:5.5.61-linux-armv7l  --os linux --arch arm   --variant v7
 	docker manifest annotate biarms/mysql biarms/mysql:5.5.61-linux-aarch64 --os linux --arch arm64 --variant v8
