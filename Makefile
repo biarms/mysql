@@ -5,7 +5,7 @@ SHELL = bash
 #DOCKER_REGISTRY=''
 DOCKER_IMAGE_NAME=biarms/mysql
 DOCKER_IMAGE_TAGNAME=$(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):linux-$(ARCH)-$(DOCKER_IMAGE_VERSION)
-DOCKER_FILE=Dockerfile-$(ARCH)-$(DOCKER_IMAGE_VERSION)
+DOCKER_FILE=Dockerfile-$(ARCH)
 
 default: build test tag push-images
 
