@@ -38,7 +38,7 @@ test: version
 	docker run --rm $(DOCKER_IMAGE_NAME) mysqld --version | grep mysql
 	docker run --rm $(DOCKER_IMAGE_NAME) mysql --version | grep $(DOCKER_IMAGE_VERSION)
 	docker run --rm $(DOCKER_IMAGE_NAME) mysqld --version | grep $(DOCKER_IMAGE_VERSION)
-	# Next checks are (strangely) NOK with armv6l build. Maybe mysql is
+	# Next checks are (strangely) NOK with armv6l build. See
 	# docker run --rm $(DOCKER_IMAGE_NAME) mysql --version | grep $(ARCH)
 	# docker run --rm $(DOCKER_IMAGE_NAME) mysqld --version | grep $(ARCH)
 	# docker run -it --rm --name mysql-test -e MYSQL_ROOT_PASSWORD=password $(DOCKER_IMAGE_NAME)
@@ -67,7 +67,7 @@ version: check
 start: check
 	docker run --rm -e MYSQL_ROOT_PASSWORD=changeit -it $(DOCKER_IMAGE_TAGNAME) mysqld
 
-push-manifest: check
+push-manifest-with-manifest-tool:
 	# When https://github.com/docker/cli/pull/138 merged branch will be part of an official release:
 	# docker manifest create biarms/mysql biarms/mysql-arm
 	# docker manifest annotate biarms/mysql biarms/mysql-arm --os linux --arch arm
@@ -96,3 +96,14 @@ push-manifest: check
 	manifest-tool push from-spec manifest.yaml
 	# rm manifest.yaml
 
+push-manifest:
+	docker manifest create biarms/mysql:5.5 biarms/mysql:5.5.61-linux-aarch64
+	docker manifest annotate biarms/mysql:5.5 biarms/mysql:5.5.60-linux-armv6l  --os linux --arch arm   --variant v6
+	docker manifest annotate biarms/mysql:5.5 biarms/mysql:5.5.61-linux-armv7l  --os linux --arch arm   --variant v7
+	docker manifest annotate biarms/mysql:5.5 biarms/mysql:5.5.61-linux-aarch64 --os linux --arch arm64 --variant v8
+	docker manifest push biarms/mysql:5.5
+	docker manifest create biarms/mysql biarms/mysql:5.5.61-linux-aarch64
+	docker manifest annotate biarms/mysql biarms/mysql:5.5.60-linux-armv6l  --os linux --arch arm   --variant v6
+	docker manifest annotate biarms/mysql biarms/mysql:5.5.61-linux-armv7l  --os linux --arch arm   --variant v7
+	docker manifest annotate biarms/mysql biarms/mysql:5.5.61-linux-aarch64 --os linux --arch arm64 --variant v8
+	docker manifest push biarms/mysql
