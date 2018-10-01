@@ -22,7 +22,7 @@ RUN set -x \
 	&& chmod +x /usr/local/bin/gosu \
 	&& gosu nobody true \
 	&& apt-get purge -y --auto-remove ca-certificates wget \
-        && rm -rf /var/lib/apt/lists/*
+	&& rm -rf /var/lib/apt/lists/*
 # Changed from original - end: upgrade to 1.9 (was inspired by https://github.com/rothgar/rpi-wordpress/blob/master/mysql/Dockerfile)
 
 RUN mkdir /docker-entrypoint-initdb.d
@@ -49,8 +49,8 @@ RUN set -ex; \
 	rm -r "$GNUPGHOME"; \
 	apt-key list > /dev/null
 
-ENV MYSQL_MAJOR 5.7
-# Changed from original - start: MYSQL_VERSION is not used anymore
+# Changed from original - start: MYSQL_VERSION and ENV MYSQL_MAJOR 5.7 are not used anymore
+# ENV MYSQL_MAJOR 5.7
 # ENV MYSQL_VERSION 5.7.21-1debian8
 # Changed from original - end
 
@@ -88,6 +88,8 @@ RUN { \
 VOLUME /var/lib/mysql
 
 # Changed from original - start: download the official docker-entrypoint.sh file from official github repo
+# We copy the 'docker-entrypoint from 5.7 even if previous code install 5.5, as 5.7 is improved and because it works anyway ;)
+ENV MYSQL_MAJOR 5.7
 ADD https://raw.githubusercontent.com/docker-library/mysql/master/${MYSQL_MAJOR}/docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
  && chown mysql:mysql /usr/local/bin/docker-entrypoint.sh \

@@ -7,7 +7,7 @@ DOCKER_IMAGE_NAME=biarms/mysql
 DOCKER_IMAGE_TAGNAME=$(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):linux-$(ARCH)-$(DOCKER_IMAGE_VERSION)
 DOCKER_FILE=Dockerfile-$(ARCH)-$(DOCKER_IMAGE_VERSION)
 
-default: build test tag push
+default: build test tag push-images
 
 check:
 	@if [[ "$(DOCKER_IMAGE_VERSION)" == "" ]]; then \
