@@ -2,7 +2,7 @@
 set -eo pipefail
 set -x
 
-export DOCKER_IMAGE_VERSION=5.5.59
+export DOCKER_IMAGE_VERSION=5.5.61
 export ARCH=$(arch)
 
 if [[ "$ARCH" == "armv6l" ]]; then
