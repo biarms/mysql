@@ -5,7 +5,6 @@ SHELL = bash
 #DOCKER_REGISTRY=''
 DOCKER_IMAGE_NAME=biarms/mysql
 DOCKER_IMAGE_TAGNAME=$(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):linux-$(ARCH)-$(DOCKER_IMAGE_VERSION)
-DOCKER_FILE=Dockerfile-$(ARCH)
 
 default: build test tag push-images
 
@@ -30,11 +29,15 @@ check:
 	@echo "DOCKER_REGISTRY: $(DOCKER_REGISTRY)"
 
 build: check
-	docker build -t $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):latest -f $(DOCKER_FILE) .
+	docker build -t $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):latest $(DOCKER_FILE) .
 
 test: version
 	docker run --rm $(DOCKER_IMAGE_NAME) /bin/echo "Success."
 	docker run --rm $(DOCKER_IMAGE_NAME) uname -a
+	docker run --rm $(DOCKER_IMAGE_NAME) mysql --version || grep mysql
+	docker run --rm $(DOCKER_IMAGE_NAME) mysqld --version || grep mysql
+	docker run --rm $(DOCKER_IMAGE_NAME) mysql --version || grep $DOCKER_IMAGE_VERSION
+	docker run --rm $(DOCKER_IMAGE_NAME) mysqld --version || grep $DOCKER_IMAGE_VERSION
 
 tag: check
 	docker tag $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):latest $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
@@ -54,6 +57,7 @@ rebuild: rmi build
 
 version: check
 	docker run --rm $(DOCKER_IMAGE_NAME) mysql --version
+	docker run --rm $(DOCKER_IMAGE_NAME) mysqld --version
 
 start: check
 	docker run --rm -e MYSQL_ROOT_PASSWORD=changeit -it $(DOCKER_IMAGE_TAGNAME) mysqld
