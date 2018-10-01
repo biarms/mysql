@@ -38,6 +38,8 @@ test: version
 	docker run --rm $(DOCKER_IMAGE_NAME) mysqld --version | grep mysql
 	docker run --rm $(DOCKER_IMAGE_NAME) mysql --version | grep $(DOCKER_IMAGE_VERSION)
 	docker run --rm $(DOCKER_IMAGE_NAME) mysqld --version | grep $(DOCKER_IMAGE_VERSION)
+	docker run --rm $(DOCKER_IMAGE_NAME) mysql --version | grep $(ARCH)
+	docker run --rm $(DOCKER_IMAGE_NAME) mysqld --version | grep $(ARCH)
 
 tag: check
 	docker tag $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):latest $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
