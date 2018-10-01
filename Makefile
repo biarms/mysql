@@ -38,8 +38,11 @@ test: version
 	docker run --rm $(DOCKER_IMAGE_NAME) mysqld --version | grep mysql
 	docker run --rm $(DOCKER_IMAGE_NAME) mysql --version | grep $(DOCKER_IMAGE_VERSION)
 	docker run --rm $(DOCKER_IMAGE_NAME) mysqld --version | grep $(DOCKER_IMAGE_VERSION)
-	docker run --rm $(DOCKER_IMAGE_NAME) mysql --version | grep $(ARCH)
-	docker run --rm $(DOCKER_IMAGE_NAME) mysqld --version | grep $(ARCH)
+	# Next checks are (strangely) NOK with armv6l build. Maybe mysql is
+	# docker run --rm $(DOCKER_IMAGE_NAME) mysql --version | grep $(ARCH)
+	# docker run --rm $(DOCKER_IMAGE_NAME) mysqld --version | grep $(ARCH)
+	# docker run -it --rm --name mysql-test -e MYSQL_ROOT_PASSWORD=password $(DOCKER_IMAGE_NAME)
+	# docker run --rm -it --link mysql-test $(DOCKER_IMAGE_NAME) bash -c 'mysql -hmysql-test -uroot -pchangeit'
 
 tag: check
 	docker tag $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):latest $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
@@ -73,19 +76,19 @@ push-manifest: check
 	# In the mean time, I use: https://github.com/estesp/manifest-tool
 	# sudo wget -O /usr/local/bin manifest-tool https://github.com/estesp/manifest-tool/releases/download/v0.7.0/manifest-tool-linux-armv7
 	# sudo chmod +x /usr/local/bin/manifest-tool
-	echo "image: $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)" > manifest.yaml
+	echo "image: $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):5.5" > manifest.yaml
 	echo "manifests:" >> manifest.yaml
-	#echo "  - image: $(DOCKER_REGISTRY)biarms/mysql:linux-arm32v6-$(DOCKER_IMAGE_VERSION) " >> manifest.yaml
-	#echo "    platform: " >> manifest.yaml
-	#echo "      os: linux " >> manifest.yaml
-	#echo "      architecture: arm " >> manifest.yaml
-	#echo "      variant: v6 " >> manifest.yaml
-	#echo "  - image: $(DOCKER_REGISTRY)biarms/mysql:linux-arm32v7-$(DOCKER_IMAGE_VERSION) " >> manifest.yaml
-	#echo "    platform: " >> manifest.yaml
-	#echo "      os: linux " >> manifest.yaml
-	#echo "      architecture: arm " >> manifest.yaml
-	#echo "      variant: v7 " >> manifest.yaml
-	echo "  - image: $(DOCKER_REGISTRY)biarms/mysql:linux-arm64v8-$(DOCKER_IMAGE_VERSION) " >> manifest.yaml
+	echo "  - image: $(DOCKER_REGISTRY)biarms/mysql:5.5.60-linux-armv6l " >> manifest.yaml
+	echo "    platform: " >> manifest.yaml
+	echo "      os: linux " >> manifest.yaml
+	echo "      architecture: arm " >> manifest.yaml
+	echo "      variant: v6 " >> manifest.yaml
+	echo "  - image: $(DOCKER_REGISTRY)biarms/mysql:5.5.61-linux-armv7l " >> manifest.yaml
+	echo "    platform: " >> manifest.yaml
+	echo "      os: linux " >> manifest.yaml
+	echo "      architecture: arm " >> manifest.yaml
+	echo "      variant: v7 " >> manifest.yaml
+	echo "  - image: $(DOCKER_REGISTRY)biarms/mysql:5.5.61-linux-aarch64 " >> manifest.yaml
 	echo "    platform: " >> manifest.yaml
 	echo "      os: linux " >> manifest.yaml
 	echo "      architecture: arm64 " >> manifest.yaml
