@@ -97,6 +97,12 @@ push-manifest-with-manifest-tool:
 	# rm manifest.yaml
 
 push-manifest:
+	# Pre-requist to perform next step (inspired from https://github.com/hypriot/rpi-mysql/blob/master/.travis.yml)
+	# echo "Enabling docker client experimental features"
+	# mkdir -p ~/.docker
+	# echo '{ "experimental": "enabled" }' > ~/.docker/config.json
+	# docker version
+	#
 	docker manifest create --amend biarms/mysql:5.5 biarms/mysql:5.5.60-linux-armv6l biarms/mysql:5.5.61-linux-armv7l biarms/mysql:5.5.61-linux-aarch64
 	docker manifest annotate biarms/mysql:5.5 biarms/mysql:5.5.60-linux-armv6l  --os linux --arch arm   --variant v6
 	docker manifest annotate biarms/mysql:5.5 biarms/mysql:5.5.61-linux-armv7l  --os linux --arch arm   --variant v7
