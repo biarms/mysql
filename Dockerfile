@@ -89,8 +89,9 @@ VOLUME /var/lib/mysql
 
 # Changed from original - start: download the official docker-entrypoint.sh file from official github repo
 # We copy the 'docker-entrypoint from 5.7 even if previous code install 5.5, as 5.7 is improved and because it works anyway ;)
-ENV MYSQL_MAJOR 5.7
-ADD https://raw.githubusercontent.com/docker-library/mysql/master/${MYSQL_MAJOR}/docker-entrypoint.sh /usr/local/bin/
+# ENV MYSQL_MAJOR 5.7
+# ADD https://raw.githubusercontent.com/docker-library/mysql/master/${MYSQL_MAJOR}/docker-entrypoint.sh /usr/local/bin/
+COPY entrypoint-5.5.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
  && chown mysql:mysql /usr/local/bin/docker-entrypoint.sh \
  && ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat

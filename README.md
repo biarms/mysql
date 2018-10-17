@@ -25,9 +25,9 @@ Image: biarms/mysql:5.5
    - linux/arm/v7
 ```
 
-Notices that these images are build on top of official docker images (resin/raspbian for armv6 and ubuntu for armv7 and arm64), and offer the same 'docker-entry-point' functionality as the official images (including the MYSQL_ROOT_PASSWORD_FILE usefull for docker swarm). By the way, the docker-entry-point.sh file embedded in the ubuntu based images is directly downloaded from the official mysql docker repository.
+Notices that these images are build on top of official docker images (resin/raspbian for armv6 and ubuntu for armv7 and arm64), and (try to) offer the same 'docker-entry-point' functionality as the official images (including the MYSQL_ROOT_PASSWORD_FILE usefull for docker swarm).
 
-As these docker images were created to mimic as much as possible the official mysql build, the official 'mysql' readme (generated in [docker-library/docs](https://github.com/docker-library/docs) and specifically in [docker-library/docs/mysql](https://github.com/docker-library/docs/tree/master/mysql)) should be fully applicable.
+As these docker images were created to mimic as much as possible the official mysql build, the official 'mysql' readme (available at [docker-library/docs](https://github.com/docker-library/docs) and specifically in [docker-library/docs/mysql](https://github.com/docker-library/docs/tree/master/mysql)) should be fully applicable.
 
 To pull this image from [docker hub/docker cloud](https://hub.docker.com/r/biarms/mysql/):
 ```
