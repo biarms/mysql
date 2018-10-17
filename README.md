@@ -16,24 +16,22 @@ Image: mysql
 ```
 While
 ```
-# docker run --rm mplatform/mquery biarms/mysql:5.7
-Image: biarms/mysql:5.7
- * Manifest List: No
- * Supports: arm/linux
+# docker run --rm mplatform/mquery biarms/mysql:5.5
+Image: biarms/mysql:5.5
+ * Manifest List: Yes
+ * Supported platforms:
+   - linux/arm/v6
+   - linux/arm64
+   - linux/arm/v7
 ```
 
-Notices that these images are build on top of official docker images (resin/raspbian for mysql-server 5.5 and ubuntu for mysql-server 5.7), and offer the same 'docker-entry-point' functionality as the official images (including the MYSQL_ROOT_PASSWORD_FILE usefull for docker swarm). By the way, the docker-entry-point.sh file embedded in this image is directly downloaded from the official mysql docker repository.
-
-Conclusions: 
-- The 5.7 image was designed to be compliant with arm32v7, and therefore, should be able to run on Raspberry Pi (2 and 3), Odroid, Orange PI, etc. But NOT with a Raspberry Pi 1.
-- However, the 5.5 image was designed to be compliant with arm32v6, and therefore, should be able to run on any ARM devices, including Raspberry Pi 1 and Raspberry pi Zero.
+Notices that these images are build on top of official docker images (resin/raspbian for armv6 and ubuntu for armv7 and arm64), and offer the same 'docker-entry-point' functionality as the official images (including the MYSQL_ROOT_PASSWORD_FILE usefull for docker swarm). By the way, the docker-entry-point.sh file embedded in the ubuntu based images is directly downloaded from the official mysql docker repository.
 
 As these docker images were created to mimic as much as possible the official mysql build, the official 'mysql' readme (generated in [docker-library/docs](https://github.com/docker-library/docs) and specifically in [docker-library/docs/mysql](https://github.com/docker-library/docs/tree/master/mysql)) should be fully applicable.
 
 To pull this image from [docker hub/docker cloud](https://hub.docker.com/r/biarms/mysql/):
 ```
-$ docker pull biarms/mysql:5.5 # for arm32v6 OS, like RPI0 or RPI1
-$ docker pull biarms/mysql:5.7 # for arm32v7 OS, like RPI2, RPI3, ODROID-XU4, Orange Pi, etc.
+$ docker pull biarms/mysql:5.5 # should work on any arm device
 ```
 
 ## Test of this image on different ARM boxes:
@@ -43,45 +41,39 @@ $ docker pull biarms/mysql:5.7 # for arm32v7 OS, like RPI2, RPI3, ODROID-XU4, Or
 cat /etc/os-release
 docker run --rm -it biarms/mysql:5.5 uname -a
 docker run --rm -it biarms/mysql:5.5 --version
-docker run --rm -it biarms/mysql:5.7 uname -a
-docker run --rm -it biarms/mysql:5.7 --version
 ```
 
 ### Tests results with an Odroid XU4 (on a armv7l OS):
 ```
 $ cat /etc/os-release
 NAME="Ubuntu"
-VERSION="16.04.3 LTS (Xenial Xerus)"
+VERSION="18.04.1 LTS (Bionic Beaver)"
 ID=ubuntu
 ID_LIKE=debian
-PRETTY_NAME="Ubuntu 16.04.3 LTS"
-VERSION_ID="16.04"
-HOME_URL="http://www.ubuntu.com/"
-SUPPORT_URL="http://help.ubuntu.com/"
-BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"
-VERSION_CODENAME=xenial
-UBUNTU_CODENAME=xenial
+PRETTY_NAME="Ubuntu 18.04.1 LTS"
+VERSION_ID="18.04"
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+VERSION_CODENAME=bionic
+UBUNTU_CODENAME=bionic
 
 $ docker run --rm -it biarms/mysql:5.5 uname -a
-Linux aed8004324bd 4.9.27-35 #1 SMP PREEMPT Tue May 9 22:16:51 UTC 2017 armv7l GNU/Linux
+Linux 536497b49325 4.14.55-146 #1 SMP PREEMPT Wed Jul 11 22:31:01 -03 2018 armv7l GNU/Linux
 
 $ docker run --rm -it biarms/mysql:5.5 --version
-180201  0:48:12 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
-mysqld  Ver 5.5.59-0+deb8u1 for debian-linux-gnu on armv7l ((Debian))
-
-$ docker run --rm -it biarms/mysql:5.7 uname -a
-Linux a6109d57acce 4.9.27-35 #1 SMP PREEMPT Tue May 9 22:16:51 UTC 2017 armv7l armv7l armv7l GNU/Linux
-
-$ docker run --rm -it biarms/mysql:5.7 --version
+181017 19:48:45 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
+mysqld  Ver 5.5.60-0+deb7u1 for debian-linux-gnu on armv7l ((Debian))
 ```
 
-### Tests with an Raspberry PI 3 (on a armv7l OS):
+### Tests with an Raspberry PI 3 (running a raspian armv7 OS):
 ```
 $ cat /etc/os-release
-PRETTY_NAME="Raspbian GNU/Linux 8 (jessie)"
+PRETTY_NAME="Raspbian GNU/Linux 9 (stretch)"
 NAME="Raspbian GNU/Linux"
-VERSION_ID="8"
-VERSION="8 (jessie)"
+VERSION_ID="9"
+VERSION="9 (stretch)"
 ID=raspbian
 ID_LIKE=debian
 HOME_URL="http://www.raspbian.org/"
@@ -89,60 +81,62 @@ SUPPORT_URL="http://www.raspbian.org/RaspbianForums"
 BUG_REPORT_URL="http://www.raspbian.org/RaspbianBugs"
 
 $ docker run --rm -it biarms/mysql:5.5 uname -a
-Linux 5a41fab6f9e2 4.9.77-v7+ #1081 SMP Wed Jan 17 16:15:20 GMT 2018 armv7l GNU/Linux
+Linux 80e6e9733c8c 4.14.34-v7+ #1110 SMP Mon Apr 16 15:18:51 BST 2018 armv7l GNU/Linux
 
 $ docker run --rm -it biarms/mysql:5.5 --version
-180201  0:49:55 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
-mysqld  Ver 5.5.59-0+deb8u1 for debian-linux-gnu on armv7l ((Debian))
-
-$ docker run --rm -it biarms/mysql:5.7 uname -a
-Unable to find image 'biarms/mysql:5.7' locally
-5.7: Pulling from biarms/mysql
-Digest: sha256:93876d5a0f3a463f1d77e49afe9306ab12c58465c13e87623a1390bc45c22276
-Status: Downloaded newer image for biarms/mysql:5.7
-Linux a1be7c2b57f5 4.9.77-v7+ #1081 SMP Wed Jan 17 16:15:20 GMT 2018 armv7l armv7l armv7l GNU/Linux
-
-$ docker run --rm -it biarms/mysql:5.7 --version
-mysqld  Ver 5.7.21-0ubuntu0.16.04.1 for Linux on armv7l ((Ubuntu))
+181017 20:22:36 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
+mysqld  Ver 5.5.60-0+deb7u1 for debian-linux-gnu on armv7l ((Debian))
 ```
 
-### Tests with an Orange PI (on a aarch64 OS):
+### Tests with an Raspberry PI 3 (running a debian aarch64 OS):
 ```
-# cat /etc/os-release
+$ cat /etc/os-release
+PRETTY_NAME="Debian GNU/Linux buster/sid"
+NAME="Debian GNU/Linux"
+ID=debian
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"
+
+$ docker run --rm -it biarms/mysql:5.5 uname -a
+Linux 1e6e450fabf8 4.18.0-2-arm64 #1 SMP Debian 4.18.10-2 (2018-10-07) aarch64 aarch64 aarch64 GNU/Linux
+
+$ docker run --rm -it biarms/mysql:5.5 --version
+181017 19:57:33 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
+mysqld  Ver 5.5.61-0ubuntu0.14.04.1 for debian-linux-gnu on aarch64 ((Ubuntu))
+```
+
+### Tests with an Rock 64 board (on a aarch64 OS):
+```
+$ cat /etc/os-release
 NAME="Ubuntu"
-VERSION="16.04.3 LTS (Xenial Xerus)"
+VERSION="18.04 LTS (Bionic Beaver)"
 ID=ubuntu
 ID_LIKE=debian
-PRETTY_NAME="Ubuntu 16.04.3 LTS"
-VERSION_ID="16.04"
-HOME_URL="http://www.ubuntu.com/"
-SUPPORT_URL="http://help.ubuntu.com/"
-BUG_REPORT_URL="http://bugs.launchpad.net/ubuntu/"
-VERSION_CODENAME=xenial
-UBUNTU_CODENAME=xenial
+PRETTY_NAME="Ubuntu 18.04 LTS"
+VERSION_ID="18.04"
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+VERSION_CODENAME=bionic
+UBUNTU_CODENAME=bionic
 
-# docker run --rm -it biarms/mysql:5.5 uname -a
-Linux 4cc9fec6292b 3.10.102 #115 SMP PREEMPT Sat Dec 3 09:19:19 CST 2016 aarch64 GNU/Linux
+$ docker run --rm -it biarms/mysql:5.5 uname -a
+Linux b0c7998b824e 4.4.132-1072-rockchip-ayufan-ga1d27dba5a2e #1 SMP Sat Jul 21 20:18:03 UTC 2018 aarch64 GNU/Linux
 
-# docker run --rm -it biarms/mysql:5.5 --version
-180201  0:49:58 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
-mysqld  Ver 5.5.59-0+deb8u1 for debian-linux-gnu on armv7l ((Debian))
-
-# docker run --rm -it biarms/mysql:5.7 uname -a
-Linux 2f48120c7588 3.10.102 #115 SMP PREEMPT Sat Dec 3 09:19:19 CST 2016 aarch64 aarch64 aarch64 GNU/Linux
-
-# docker run --rm -it biarms/mysql:5.7 --version
-mysqld  Ver 5.7.21-0ubuntu0.16.04.1 for Linux on armv7l ((Ubuntu))
+$ docker run --rm -it biarms/mysql:5.5 --version
+181017 19:51:19 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
+mysqld  Ver 5.5.59-0+deb7u1 for debian-linux-gnu on armv7l ((Debian))
 ```
-
 
 ### Tests with an Raspberry PI 1 (on a armv6 OS):
 ```
 $ cat /etc/os-release
-PRETTY_NAME="Raspbian GNU/Linux 8 (jessie)"
+PRETTY_NAME="Raspbian GNU/Linux 9 (stretch)"
 NAME="Raspbian GNU/Linux"
-VERSION_ID="8"
-VERSION="8 (jessie)"
+VERSION_ID="9"
+VERSION="9 (stretch)"
 ID=raspbian
 ID_LIKE=debian
 HOME_URL="http://www.raspbian.org/"
@@ -150,11 +144,11 @@ SUPPORT_URL="http://www.raspbian.org/RaspbianForums"
 BUG_REPORT_URL="http://www.raspbian.org/RaspbianBugs"
 
 $ docker run --rm -it biarms/mysql:5.5 uname -a
-Linux d75a854ad6d5 4.9.78+ #1084 Thu Jan 25 17:40:10 GMT 2018 armv6l GNU/Linux
+Linux 801449bca92e 4.9.59+ #1047 Sun Oct 29 11:47:10 GMT 2017 armv6l GNU/Linux
 
 $ docker run --rm -it biarms/mysql:5.5 --version
-180201  0:48:16 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
-mysqld  Ver 5.5.59-0+deb8u1 for debian-linux-gnu on armv7l ((Debian))
+181017 20:19:22 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
+mysqld  Ver 5.5.60-0+deb7u1 for debian-linux-gnu on armv7l ((Debian))
 ```
 
 
