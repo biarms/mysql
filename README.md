@@ -31,8 +31,11 @@ As these docker images were created to mimic as much as possible the official my
 
 To pull this image from [docker hub/docker cloud](https://hub.docker.com/r/biarms/mysql/):
 ```
-$ docker pull biarms/mysql:5.5 # should work on any arm device
+$ docker pull biarms/mysql:5.5 # should get the correct arm images on any arm device
 ```
+
+Caution: like 'latest', the version 5.5 is a moving target: today, it gives 5.5.60. Tomorrow, it could give 5.5.61.
+Be sure to always run the 'docker pull biarms/mysql:5.5' to get the latest images.
 
 ## Test of this image on different ARM boxes:
 
@@ -126,8 +129,8 @@ $ docker run --rm -it biarms/mysql:5.5 uname -a
 Linux b0c7998b824e 4.4.132-1072-rockchip-ayufan-ga1d27dba5a2e #1 SMP Sat Jul 21 20:18:03 UTC 2018 aarch64 GNU/Linux
 
 $ docker run --rm -it biarms/mysql:5.5 --version
-181017 19:51:19 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
-mysqld  Ver 5.5.59-0+deb7u1 for debian-linux-gnu on armv7l ((Debian))
+181017 22:09:41 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
+mysqld  Ver 5.5.61-0ubuntu0.14.04.1 for debian-linux-gnu on aarch64 ((Ubuntu))
 ```
 
 ### Tests with an Raspberry PI 1 (on a armv6 OS):
@@ -147,7 +150,7 @@ $ docker run --rm -it biarms/mysql:5.5 uname -a
 Linux 801449bca92e 4.9.59+ #1047 Sun Oct 29 11:47:10 GMT 2017 armv6l GNU/Linux
 
 $ docker run --rm -it biarms/mysql:5.5 --version
-181017 20:19:22 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
+181017 22:10:26 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
 mysqld  Ver 5.5.60-0+deb7u1 for debian-linux-gnu on armv7l ((Debian))
 ```
 

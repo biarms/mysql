@@ -50,8 +50,8 @@ tag: check
 
 push-images: check
 	docker push $(DOCKER_IMAGE_TAGNAME)
-	docker push $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
-	docker push $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):latest
+	# docker push $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)
+	# docker push $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):latest
 
 push: push-manifest push-images
 
