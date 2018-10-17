@@ -25,7 +25,7 @@ check:
         echo '    ARCH=arm64v8 DOCKER_IMAGE_VERSION=5.7 make' && \
         exit 1; \
 	fi
-	@which manifest-tool > /dev/null || (echo "Ensure that you've got the manifest-tool utility in your path. Could be downloaded from  https://github.com/estesp/manifest-tool/releases/download/" && exit 2)
+	@which manifest-tool > /dev/null || (echo "Ensure that you've got the manifest-tool utility in your path. Could be downloaded from  https://github.com/estesp/manifest-tool/releases/" && exit 2)
 	@echo "DOCKER_REGISTRY: $(DOCKER_REGISTRY)"
 
 build: check
