@@ -1,26 +1,39 @@
-# Pull base image
+# 1. Define args usable during the pre-build phase
+# BUILD_ARCH: the docker architecture, with a tailing '/'. For instance, "arm32v6/"
+ARG BUILD_ARCH
+
+# If we call 'apt-get install mysql-server' in stretch, it will not install mysql but mariadb !
+# FROM resin/rpi-raspbian:stretch
+# It is also not possible to inherit from buster: in buster repo, there is no more 'mysql-server' binaries (only mariadb-server-10.0 or mariadb-server-10.3, but also the 'default-mysql-server' metapackage)
+# FROM resin/rpi-raspbian:buster
+# An debian is not an option for armv6 architecture (don't exist for armv6 !)
+# FROM ${BUILD_ARCH}debian:jessie
+# So let's continue to use wheezy ! ${BUILD_ARCH} is not needed for resin/rpi-raspbian: it is always armv6 !
 FROM resin/rpi-raspbian:wheezy
-#FROM debian:jessie
+
 MAINTAINER Brother In Arms <project.biarms@gmail.com>
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 RUN groupadd -r mysql && useradd -r -g mysql mysql
 
+# As raspbian repo as moved (as explained here: https://www.raspberrypi.org/forums/viewtopic.php?t=237469), we get the following error:
+#    Failed to fetch http://archive.raspbian.org/raspbian/dists/wheezy/main/binary-armhf/Packages  404  Not Found
+# Next line is here to workaround this issue
+RUN sed -i 's/archive.raspbian.org/legacy.raspbian.org/g' /etc/apt/sources.list
+
+RUN set -x \
+	&& apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && rm -rf /var/lib/apt/lists/*
+
 # (Upgrade to 1.9 was inspired by https://github.com/rothgar/rpi-wordpress/blob/master/mysql/Dockerfile)
 # add gosu for easy step-down from root
-ENV GOSU_VERSION 1.9
+ENV GOSU_VERSION 1.12
+
 RUN set -x \
-	&& apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && rm -rf /var/lib/apt/lists/* \
-	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
-	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }').asc" \
-	&& export GNUPGHOME="$(mktemp -d)" \
-	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-	&& gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-	&& rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
+    & wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
 	&& chmod +x /usr/local/bin/gosu \
 	&& gosu nobody true \
 	&& apt-get purge -y --auto-remove ca-certificates wget \
-        && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /docker-entrypoint-initdb.d
 
@@ -37,7 +50,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		perl \
 	&& rm -rf /var/lib/apt/lists/*
 
-ENV MYSQL_MAJOR 5.5
+# RUN apt-get update && apt-cache search mysql-server
+# Found only mysql-server-5.1 and mysql-server-5.5
+ENV MYSQL_MAJOR=5.5
 
 # the "/var/lib/mysql" stuff here is because the mysql-server postinst doesn't have an explicit way to disable the mysql_install_db codepath besides having a database already "configured" (ie, stuff in /var/lib/mysql/mysql)
 # also, we set debconf keys to make APT a little quieter
@@ -47,7 +62,7 @@ RUN { \
 		echo mysql-server mysql-server/root_password_again password 'changeit'; \
 		echo mysql-server mysql-server/remove-test-db select false; \
 	} | debconf-set-selections \
-	&& apt-get update && apt-get install -y mysql-server="${MYSQL_VERSION}"* && rm -rf /var/lib/apt/lists/* \
+	&& apt-get update && apt-get install -y mysql-server="${MYSQL_MAJOR}"* && rm -rf /var/lib/apt/lists/* \
 	&& rm -rf /var/lib/mysql && mkdir -p /var/lib/mysql && chown -R mysql:mysql /var/lib/mysql
 
 # comment out a few problematic configuration values
@@ -67,3 +82,10 @@ CMD ["mysqld"]
 
 # (inspired by https://github.com/rothgar/rpi-wordpress/blob/master/mysql/Dockerfile)
 ADD my-small.cnf /etc/mysql/conf.d/my.cnf
+
+ARG VCS_REF
+ARG BUILD_DATE
+LABEL \
+	org.label-schema.build-date=${BUILD_DATE} \
+	org.label-schema.vcs-ref=${VCS_REF} \
+	org.label-schema.vcs-url="https://github.com/biarms/mysql"

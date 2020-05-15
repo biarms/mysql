@@ -1,0 +1,47 @@
+language: bash
+
+dist: bionic
+
+# From https://docs.travis-ci.com/user/customizing-the-build/
+# install: true
+#env:
+#  global:
+#    - DOCKER_CLI_EXPERIMENTAL=enabled
+# sudo: required
+#services:
+#  - docker
+
+env:
+  - DOCKER_CLI_EXPERIMENTAL=enabled
+
+before_install:
+  - sudo rm -rf /var/lib/apt/lists/*
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  - lsb_release -cs
+  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) edge"
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+  - docker version
+  - BUILD_NUMBER="${TRAVIS_BUILD_NUMBER}"
+  - >
+    if [[ "${TRAVIS_BRANCH}" == "master" && "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
+      echo "We are building the master branch: version is official version."
+      BETA_MODE="false"
+      BETA_VERSION=""
+    else
+      echo "We are not building the master branch (or we are in a PR mode). Building a beta version then"
+      BETA_MODE="true"
+      BETA_VERSION="-beta-${TRAVIS_BUILD_NUMBER}"
+    fi
+  - echo "TRAVIS_BRANCH=${TRAVIS_BRANCH} - DOCKER_USERNAME=${DOCKER_USERNAME} - BETA_MODE=${BETA_MODE} - BETA_VERSION=${BETA_VERSION}"
+
+script:
+  - BETA_VERSION=${BETA_VERSION} make build
+
+after_success:
+  - >
+    if [[ "${BETA_MODE}" == "false" ]]; then
+      echo "Building master branch. Let's also push the 'latest' tag on docker hub"
+      echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
+      make push
+    fi
