@@ -19,7 +19,7 @@ default: build
 
 build: all-images create-and-push-manifests
 
-push:
+push: check-binaries
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push "biarms/mysql:latest"
 
 all-images: prepare
@@ -58,12 +58,14 @@ create-and-push-manifests: #ideally, should reference 'all-images', but that's b
 
 all-one-image: build-one-image test-one-image tag-one-image push-one-image
 
-check:
+check-binaries:
 	@ which docker > /dev/null || (echo "Please install docker before using this script" && exit 1)
 	@ which git > /dev/null || (echo "Please install git before using this script" && exit 2)
 	@ # deprecated: which manifest-tool > /dev/null || (echo "Ensure that you've got the manifest-tool utility in your path. Could be downloaded from  https://github.com/estesp/manifest-tool/releases/" && exit 3)
 	@ DOCKER_CLI_EXPERIMENTAL=enabled docker manifest --help | grep "docker manifest COMMAND" > /dev/null || (echo "docker manifest is needed. Consider upgrading docker" && exit 4)
 	@ DOCKER_CLI_EXPERIMENTAL=enabled docker version -f '{{.Client.Experimental}}' | grep "true" > /dev/null || (echo "docker experimental mode is not enabled" && exit 5)
+
+check: check-binaries
 	@ if [[ "$(DOCKER_IMAGE_VERSION)" == "" ]]; then \
 	    echo 'DOCKER_IMAGE_VERSION is $(DOCKER_IMAGE_VERSION) (MUST BE SET !)' && \
 	    echo 'Correct usage sample: ' && \
@@ -92,7 +94,7 @@ check:
 	@ echo "BUILD_DATE: ${BUILD_DATE}"
 	@ echo "VCS_REF: ${VCS_REF}"
 
-prepare: check
+prepare: check-binaries
 	@ # From https://github.com/multiarch/qemu-user-static:
 	docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
