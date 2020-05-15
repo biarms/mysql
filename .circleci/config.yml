@@ -16,4 +16,4 @@ jobs:
       - run: sudo apt-get update
       - run: sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
       - checkout
-      - run: make
+      - run: make all-images
