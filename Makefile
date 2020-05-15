@@ -115,7 +115,7 @@ test-one-image: check
 	# docker run --rm ${DOCKER_IMAGE_NAME} mysqld --version | grep "${LINUX_ARCH}"
 	docker stop mysql-test || true
 	docker rm mysql-test || true
-	docker create --name mysql-test -e MYSQL_ROOT_PASSWORD=root_password -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD=testpassword ${DOCKER_IMAGE_NAME}
+	docker create --name mysql-test -e MYSQL_ROOT_PASSWORD=root_password -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD=testpassword ${DOCKER_IMAGE_TAGNAME}
 	docker start mysql-test
 	# wait for port 3306 to be ready
 	# netstat -tulpn | grep LISTEN | grep 3306
