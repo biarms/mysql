@@ -36,7 +36,7 @@ before_install:
   - echo "TRAVIS_BRANCH=${TRAVIS_BRANCH} - DOCKER_USERNAME=${DOCKER_USERNAME} - BETA_MODE=${BETA_MODE} - BETA_VERSION=${BETA_VERSION}"
 
 script:
-  - BETA_VERSION=${BETA_VERSION} make build
+  - make build
 
 after_success:
   - >
