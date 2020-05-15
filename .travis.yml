@@ -36,12 +36,12 @@ before_install:
   - echo "TRAVIS_BRANCH=${TRAVIS_BRANCH} - DOCKER_USERNAME=${DOCKER_USERNAME} - BETA_MODE=${BETA_MODE} - BETA_VERSION=${BETA_VERSION}"
 
 script:
+  - echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
   - make build
 
 after_success:
   - >
     if [[ "${BETA_MODE}" == "false" ]]; then
       echo "Building master branch. Let's also push the 'latest' tag on docker hub"
-      echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
       make push
     fi

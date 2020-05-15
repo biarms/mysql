@@ -72,24 +72,103 @@ docker run --rm -it biarms/mysql:5.5 --version
 docker run --rm -it biarms/mysql:5.7 --version
 docker run --rm -it biarms/mysql:5.7.30 --version
 ```
-### Tests results with an Odroid XU4 (a pure armv7l device):
+### Test results with a Odroid XU4 (a pure armv7l device):
 ```
-TODO
+$ uname -a
+Linux odroid 5.4.0-odroid-armmp #1 SMP PREEMPT Ubuntu 5.4.33-202004230334~focal (2020-04-22) armv7l armv7l armv7l GNU/Linux
+
+$ cat /etc/os-release
+NAME="Ubuntu"
+VERSION="20.04 LTS (Focal Fossa)"
+ID=ubuntu
+ID_LIKE=debian
+PRETTY_NAME="Ubuntu 20.04 LTS"
+VERSION_ID="20.04"
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+VERSION_CODENAME=focal
+UBUNTU_CODENAME=focal
+
+$ docker run --rm -it biarms/mysql:5 uname -a
+Linux 21206c44333b 5.4.0-odroid-armmp #1 SMP PREEMPT Ubuntu 5.4.33-202004230334~focal (2020-04-22) armv7l armv7l armv7l GNU/Linux
+
+$ docker run --rm -it biarms/mysql:5 --version
+mysqld  Ver 5.7.30-0ubuntu0.18.04.1 for Linux on armv7l ((Ubuntu))
+
+$ docker run --rm -it biarms/mysql:5.5 --version
+200515 22:00:03 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
+mysqld  Ver 5.5.61-0ubuntu0.14.04.1 for debian-linux-gnu on armv7l ((Ubuntu))
+
+$ docker run --rm -it biarms/mysql:5.7 --version
+mysqld  Ver 5.7.30-0ubuntu0.18.04.1 for Linux on armv7l ((Ubuntu))
+
+$ docker run --rm -it biarms/mysql:5.7.30 --version
+mysqld  Ver 5.7.30-0ubuntu0.18.04.1 for Linux on armv7l ((Ubuntu))
 ```
 
-### Tests with an Raspberry PI 1 (a pure armv6 device):
+### Tests with a Raspberry PI 3 (running an ubuntu aarch64 OS):
 ```
-TODO
+$ uname -a
+Linux blue 5.4.0-1008-raspi #8-Ubuntu SMP Wed Apr 8 11:13:06 UTC 2020 aarch64 aarch64 aarch64 GNU/Linux
+
+$ cat /etc/os-release
+NAME="Ubuntu"
+VERSION="20.04 LTS (Focal Fossa)"
+ID=ubuntu
+ID_LIKE=debian
+PRETTY_NAME="Ubuntu 20.04 LTS"
+VERSION_ID="20.04"
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+VERSION_CODENAME=focal
+UBUNTU_CODENAME=focal
+
+$ docker run --rm -it biarms/mysql:5.5 uname -a
+Linux 07f3959ade48 5.4.0-1008-raspi #8-Ubuntu SMP Wed Apr 8 11:13:06 UTC 2020 aarch64 aarch64 aarch64 GNU/Linux
+
+$ docker run --rm -it biarms/mysql:5 --version
+mysqld  Ver 5.7.30-0ubuntu0.18.04.1 for Linux on aarch64 ((Ubuntu))
+
+$ docker run --rm -it biarms/mysql:5.5 --version
+200515 22:21:20 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
+mysqld  Ver 5.5.61-0ubuntu0.14.04.1 for debian-linux-gnu on aarch64 ((Ubuntu))
+
+$ docker run --rm -it biarms/mysql:5.7 --version
+mysqld  Ver 5.7.30-0ubuntu0.18.04.1 for Linux on aarch64 ((Ubuntu))
+
+$ docker run --rm -it biarms/mysql:5.7.30 --version
+mysqld  Ver 5.7.30-0ubuntu0.18.04.1 for Linux on aarch64 ((Ubuntu))
 ```
 
-### Tests with an Raspberry PI 3 (running an ubuntu aarch64 OS):
+### Tests on a x86_64 device:
 ```
-TODO
-```
+$ uname -m
+x86_64
 
-### Tests with an Rock 64 board (on an ubuntu aarch64 OS):
-```
-TODO
+$ docker run --rm -it biarms/mysql:5 uname -m
+x86_64
+
+$ docker run --rm -it biarms/mysql:5 --version
+mysqld  Ver 5.7.30-0ubuntu0.18.04.1 for Linux on x86_64 ((Ubuntu))
+
+$ docker run --rm -it biarms/mysql:5 bash -c 'cat /etc/*release' | grep 'VERSION='
+VERSION="18.04.4 LTS (Bionic Beaver)"
+
+$ docker run --rm -it biarms/mysql:5.5 --version
+Unable to find image 'biarms/mysql:5.5' locally
+5.5: Pulling from biarms/mysql
+docker: no matching manifest for linux/amd64 in the manifest list entries.
+See 'docker run --help'.
+
+$ docker run --rm -it biarms/mysql:5.7 --version
+mysqld  Ver 5.7.30-0ubuntu0.18.04.1 for Linux on x86_64 ((Ubuntu))
+
+$ docker run --rm -it biarms/mysql:5.7.30 --version
+mysqld  Ver 5.7.30-0ubuntu0.18.04.1 for Linux on x86_64 ((Ubuntu))
 ```
 
 ## Misc references:
