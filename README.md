@@ -1,5 +1,8 @@
 # About this Repo
 
+[![Travis build status](https://api.travis-ci.org/biarms/mysql.svg?branch=master)](https://travis-ci.org/biarms/mysql)
+[![CircleCI build status](https://circleci.com/gh/biarms/mysql.svg?style=svg)](https://circleci.com/gh/biarms/mysql)
+
 ## Overview
 This is a fork of the Git repo of the Docker [official image](https://docs.docker.com/docker-hub/official_repos/) for
 [Mysql](https://registry.hub.docker.com/_/mysql/). See [the Docker Hub page](https://registry.hub.docker.com/_/mysql/)
