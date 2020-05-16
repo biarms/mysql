@@ -16,4 +16,5 @@ jobs:
       - run: sudo apt-get update
       - run: sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
       - checkout
+      - run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
       - run: BETA_VERSION='-circleci' make build
