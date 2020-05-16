@@ -1,5 +1,9 @@
+# 1. Define args usable during the pre-build phase
+# BUILD_ARCH: the docker architecture, with a tailing '/'. For instance, "arm64v8/"
+ARG BUILD_ARCH
+
 # Changed from original - end: don't inherit from debian:jessie, because mysql-server-5.7 don't exist on debian:jessie arm apt-get repo
-FROM ubuntu:trusty
+FROM ${BUILD_ARCH}ubuntu:bionic
 # Changed from original - end
 # Changed from original - start: add one line to override the maintainer
 MAINTAINER Brother In Arms <project.biarms@gmail.com>
@@ -10,20 +14,17 @@ RUN groupadd -r mysql && useradd -r -g mysql mysql
 
 # Changed from original - start: upgrade to 1.9 (was inspired by https://github.com/rothgar/rpi-wordpress/blob/master/mysql/Dockerfile)
 # add gosu for easy step-down from root
-ENV GOSU_VERSION 1.9
+ENV GOSU_VERSION=1.12
+# 1.9
 RUN set -x \
-	&& apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && rm -rf /var/lib/apt/lists/* \
-	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
-	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }').asc" \
-	&& export GNUPGHOME="$(mktemp -d)" \
-	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-	&& gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-	&& rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
+	&& apt-get update && apt-get install -y --no-install-recommends ca-certificates wget gpg && rm -rf /var/lib/apt/lists/*
+
+RUN wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
 	&& chmod +x /usr/local/bin/gosu \
 	&& gosu nobody true \
 	&& apt-get purge -y --auto-remove ca-certificates wget \
 	&& rm -rf /var/lib/apt/lists/*
-# Changed from original - end: upgrade to 1.9 (was inspired by https://github.com/rothgar/rpi-wordpress/blob/master/mysql/Dockerfile)
+# Changed from original - end: upgrade to 1.12 and don't check asc file (was inspired by https://github.com/rothgar/rpi-wordpress/blob/master/mysql/Dockerfile)
 
 RUN mkdir /docker-entrypoint-initdb.d
 
@@ -40,14 +41,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		perl \
 	&& rm -rf /var/lib/apt/lists/*
 
-RUN set -ex; \
-# gpg: key 5072E1F5: public key "MySQL Release Engineering <mysql-build@oss.oracle.com>" imported
-	key='A4A9406876FCBD3C456770C88C718D3B5072E1F5'; \
-	export GNUPGHOME="$(mktemp -d)"; \
-	gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
-	gpg --export "$key" > /etc/apt/trusted.gpg.d/mysql.gpg; \
-	rm -r "$GNUPGHOME"; \
-	apt-key list > /dev/null
+# RUN set -ex; \
+# # gpg: key 5072E1F5: public key "MySQL Release Engineering <mysql-build@oss.oracle.com>" imported
+# 	key='A4A9406876FCBD3C456770C88C718D3B5072E1F5'; \
+# 	export GNUPGHOME="$(mktemp -d)"; \
+# 	gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
+# 	gpg --export "$key" > /etc/apt/trusted.gpg.d/mysql.gpg; \
+# 	rm -r "$GNUPGHOME"; \
+# 	apt-key list > /dev/null
 
 # Changed from original - start: MYSQL_VERSION and ENV MYSQL_MAJOR 5.7 are not used anymore
 # ENV MYSQL_MAJOR 5.7
@@ -70,10 +71,7 @@ RUN { \
 		echo mysql-server mysql-server/remove-test-db select false; \
         # Changed from original - end
 	} | debconf-set-selections \
-# Changed from original - start: add tzdata package to fix a timezone blocking issue at startup
-# (according to https://serverfault.com/questions/511821/how-to-update-install-zoneinfo-timezone-database-on-centos)
-	&& apt-get update && apt-get install -y "mysql-server" tzdata && rm -rf /var/lib/apt/lists/* \
-# Changed from original - end
+	&& apt-get update && apt-get install -y "mysql-server" && rm -rf /var/lib/apt/lists/* \
 	&& rm -rf /var/lib/mysql && mkdir -p /var/lib/mysql /var/run/mysqld \
 	&& chown -R mysql:mysql /var/lib/mysql /var/run/mysqld \
 # ensure that /var/run/mysqld (used for socket and lock files) is writable regardless of the UID our mysqld instance ends up having at runtime
@@ -87,18 +85,23 @@ RUN { \
 
 VOLUME /var/lib/mysql
 
-# Changed from original - start: download the official docker-entrypoint.sh file from official github repo
-# We copy the 'docker-entrypoint from 5.7 even if previous code install 5.5, as 5.7 is improved and because it works anyway ;)
-# ENV MYSQL_MAJOR 5.7
-# ADD https://raw.githubusercontent.com/docker-library/mysql/master/${MYSQL_MAJOR}/docker-entrypoint.sh /usr/local/bin/
-COPY entrypoint-5.5.sh /usr/local/bin/docker-entrypoint.sh
+ENV MYSQL_MAJOR 5.7
+ADD https://raw.githubusercontent.com/docker-library/mysql/master/${MYSQL_MAJOR}/docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
  && chown mysql:mysql /usr/local/bin/docker-entrypoint.sh \
  && ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
-# Changed from original - end: download the official docker-entrypoint.sh file from official github repo
 # Changed from original - start: on ubuntu, /usr/local/bin is not in the path
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 # Changed from original - end: on ubuntu, /usr/local/bin is not in the path
+
+# Changed from original - start: add tzdata package to fix a timezone blocking issue at startup
+# (according to https://serverfault.com/questions/511821/how-to-update-install-zoneinfo-timezone-database-on-centos)
+# To solve this error message:
+# There were fatal errors during processing of zoneinfo directory
+# make: *** [test] Error 1
+RUN ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata && rm -rf /var/lib/apt/lists/*
+# Changed from original - end
+
 
 EXPOSE 3306
 CMD ["mysqld"]
@@ -106,3 +109,10 @@ CMD ["mysqld"]
 # Changed from original: next line was added
 # (inspired by https://github.com/rothgar/rpi-wordpress/blob/master/mysql/Dockerfile)
 ADD my-small.cnf /etc/mysql/conf.d/my.cnf
+
+ARG VCS_REF
+ARG BUILD_DATE
+LABEL \
+	org.label-schema.build-date=${BUILD_DATE} \
+	org.label-schema.vcs-ref=${VCS_REF} \
+	org.label-schema.vcs-url="https://github.com/biarms/mysql"
