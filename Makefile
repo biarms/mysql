@@ -27,27 +27,34 @@ VCS_REF = `git rev-parse --short HEAD`
 MYSQL_VERSION_ARM32V6=5.5.60
 MYSQL_VERSION_OTHER_ARCH=5.7.30
 
-default: all-images
+default: build
 
-# Launch a local build as on circleci
+# Launch a local build as on circleci, that will call the default target, but inside the 'circleci build and test env'
 circleci-local-build:
 	circleci local execute
 
+build: build-all-images
+
+push: check-docker-login build-all-images create-and-push-manifests
+
 build: check-docker-login all-images create-and-push-manifests
 
-all-one-image-arm32v6: prepare
-	ARCH=arm32v6 LINUX_ARCH=armv6l  DOCKER_IMAGE_VERSION=${MYSQL_VERSION_ARM32V6} DOCKER_FILE='-f Dockerfile-arm32v6' make all-one-image
+build-all-images: prepare build-all-one-image-arm32v6 build-all-one-image-arm32v7 build-all-one-image-arm64v8 build-all-one-image-amd64
 
-all-one-image-arm32v7: prepare
-	ARCH=arm32v7 LINUX_ARCH=armv7l  DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make all-one-image
+# Actually, the 'push' will only be done is DOCKER_USERNAME is set and not empty !
+build-all-one-image: build-one-image test-one-image tag-one-image push-one-image
 
-all-one-image-arm64v8: prepare
-	ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make all-one-image
+build-all-one-image-arm32v6: prepare
+	ARCH=arm32v6 LINUX_ARCH=armv6l  DOCKER_IMAGE_VERSION=${MYSQL_VERSION_ARM32V6} DOCKER_FILE='-f Dockerfile-arm32v6' make build-all-one-image
 
-all-one-image-amd64: prepare
-	ARCH=amd64   LINUX_ARCH=x86_64  DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make all-one-image
+build-all-one-image-arm32v7: prepare
+	ARCH=arm32v7 LINUX_ARCH=armv7l  DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make build-all-one-image
 
-all-images: prepare all-one-image-arm32v6 all-one-image-arm32v7 all-one-image-arm64v8 all-one-image-amd64
+build-all-one-image-arm64v8: prepare
+	ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make build-all-one-image
+
+build-all-one-image-amd64: prepare
+	ARCH=amd64   LINUX_ARCH=x86_64  DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make build-all-one-image
 
 create-and-push-manifests: #ideally, should reference 'all-images', but that's boring when we test this script...
 	# biarms/mysql:5.7.30
@@ -76,8 +83,6 @@ create-and-push-manifests: #ideally, should reference 'all-images', but that's b
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_IMAGE_NAME}:latest${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" --os linux --arch arm64 --variant v8
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_IMAGE_NAME}:latest${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}" --os linux --arch amd64
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push "biarms/mysql:latest${BETA_VERSION}"
-
-all-one-image: build-one-image test-one-image tag-one-image push-one-image
 
 check-binaries:
 	@ which docker > /dev/null || (echo "Please install docker before using this script" && exit 1)
