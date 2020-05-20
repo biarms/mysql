@@ -3,18 +3,26 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: ubuntu:bionic
+      - image: ubuntu:focal-20200423 #ubuntu:bionic
     steps:
       - setup_remote_docker:
           version: 18.09.3 # Max supported version was found on https://circleci.com/docs/2.0/building-docker-images/
       - run: apt-get update
-      - run: apt-get install -y sudo curl make gnupg lsb-release software-properties-common git
-      - run: sudo rm -rf /var/lib/apt/lists/*
-      - run: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-      - run: lsb_release -cs
-      - run: sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) edge"
-      - run: sudo apt-get update
-      - run: sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+      # - run: sudo apt-cache madison docker.io
+      # To avoid tzdata installation 'issue': https://serverfault.com/questions/949991/how-to-install-tzdata-on-a-ubuntu-docker-image
+      - run: ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime
+      # Install docker-ce 19.03.8 because 19.03.9 will produce an "Error response from daemon: client version 1.40 is too new. Maximum supported API version is 1.39" error.
+      # See https://github.com/kubernetes-sigs/kubespray/issues/6160
+      - run: DEBIAN_FRONTEND="noninteractive" apt-get install -y sudo curl make gnupg lsb-release software-properties-common git pwgen docker.io=19.03.8*
+      # - run: sudo rm -rf /var/lib/apt/lists/*
+      # - run: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+      # - run: lsb_release -cs
+      # - run: sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+      # - run: sudo apt-get update
+      # - run: sudo apt-cache madison docker-ce
+      # # Install docker-ce 19.03.8 because 19.03.9 produce error. See https://github.com/kubernetes-sigs/kubespray/issues/6160
+      # - run: sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce=19.03.8*
+      # Does not work because the repository contains only 19.03.9 ! => go back to docker.io !
+      - run: docker version
       - checkout
-      - run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
-      - run: BETA_VERSION='-beta-circleci' make build
+      - run: BETA_VERSION='-beta-circleci' make

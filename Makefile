@@ -1,9 +1,21 @@
 SHELL = bash
 
+## Caution: this Makefile has 'multiple entries', which means that it is 'calling himself'.
+# For instance, if you call 'make circleci-local-build':
+# 1. CircleCi cli is invoked
+# 2. After have installed a build environment (inside a docker container), CircleCI will call "make" without parameter, which correspond to a 'make all-images' build (because of default target)
+# 3. And 'all-images' target will run 4 times the "make all-one-image" for 4 different architecture (arm32v6, arm32v7, arm64v8 and amd64).
+
 # Inspired from https://github.com/hypriot/rpi-mysql/blob/master/Makefile
 
-# DOCKER_REGISTRY ?= # Nothing, or 'registry:5000/'
-# BETA_VERSION ?= # Nothing, or '-beta-123'
+ # DOCKER_REGISTRY: Nothing, or 'registry:5000/'
+DOCKER_REGISTRY ?=
+ # DOCKER_USERNAME: Nothing, or 'biarms'
+DOCKER_USERNAME ?=
+ # DOCKER_PASSWORD: Nothing, or '********'
+DOCKER_PASSWORD ?=
+ # BETA_VERSION: Nothing, or '-beta-123'
+BETA_VERSION ?=
 DOCKER_IMAGE_NAME=biarms/mysql
 DOCKER_IMAGE_TAGNAME=$(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)-linux-$(ARCH)$(BETA_VERSION)
 
@@ -15,18 +27,32 @@ VCS_REF = `git rev-parse --short HEAD`
 MYSQL_VERSION_ARM32V6=5.5.60
 MYSQL_VERSION_OTHER_ARCH=5.7.30
 
-default: build
+default: all-images
 
-build: all-images create-and-push-manifests
+# Launch a local build as on circleci
+circleci-local-build:
+	circleci local execute
 
+# Call by travis for every build
+build: check-docker-login all-images create-and-push-manifests
+
+# Call by travis if branch <> master
 push: check-binaries
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push "biarms/mysql:latest"
 
-all-images: prepare
+all-one-image-arm32v6: prepare
 	ARCH=arm32v6 LINUX_ARCH=armv6l  DOCKER_IMAGE_VERSION=${MYSQL_VERSION_ARM32V6} DOCKER_FILE='-f Dockerfile-arm32v6' make all-one-image
+
+all-one-image-arm32v7: prepare
 	ARCH=arm32v7 LINUX_ARCH=armv7l  DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make all-one-image
+
+all-one-image-arm64v8: prepare
 	ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make all-one-image
+
+all-one-image-amd64: prepare
 	ARCH=amd64   LINUX_ARCH=x86_64  DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make all-one-image
+
+all-images: prepare all-one-image-arm32v6 all-one-image-arm32v7 all-one-image-arm64v8 all-one-image-amd64
 
 create-and-push-manifests: #ideally, should reference 'all-images', but that's boring when we test this script...
 	# biarms/mysql:5.7.30
@@ -94,6 +120,9 @@ check: check-binaries
 	@ echo "BUILD_DATE: ${BUILD_DATE}"
 	@ echo "VCS_REF: ${VCS_REF}"
 
+check-docker-login: check-binaries
+	@ if [[ "${DOCKER_USERNAME}" == "" ]]; then echo "DOCKER_USERNAME and DOCKER_PASSWORD env variables are mandatory for this kind of build"; exit -1; fi
+
 prepare: check-binaries
 	@ # From https://github.com/multiarch/qemu-user-static:
 	docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
@@ -102,6 +131,7 @@ build-one-image: check
 	docker build -t ${DOCKER_REGISTRY}${DOCKER_IMAGE_TAGNAME} --build-arg VERSION="${DOCKER_IMAGE_VERSION}" --build-arg VCS_REF="${VCS_REF}" --build-arg BUILD_DATE="${BUILD_DATE}" --build-arg BUILD_ARCH="${BUILD_ARCH}" ${DOCKER_FILE} .
 
 test-one-image: check
+	# Smoke tests:
 	docker run --rm ${DOCKER_IMAGE_TAGNAME} /bin/echo "Success."
 	docker run --rm ${DOCKER_IMAGE_TAGNAME} uname -a
 	docker run --rm ${DOCKER_IMAGE_TAGNAME} mysql --version
@@ -113,6 +143,7 @@ test-one-image: check
 	# on armv6l, it will return 'armv7l'...
 	# docker run --rm ${DOCKER_IMAGE_NAME} mysql --version | grep "${LINUX_ARCH}"
 	# docker run --rm ${DOCKER_IMAGE_NAME} mysqld --version | grep "${LINUX_ARCH}"
+	# Test Case 1: test that MYSQL starts
 	docker stop mysql-test || true
 	docker rm mysql-test || true
 	docker create --name mysql-test -e MYSQL_ROOT_PASSWORD=root_password -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD=testpassword ${DOCKER_IMAGE_TAGNAME}
@@ -124,12 +155,33 @@ test-one-image: check
 	# docker run --rm -it --link mysql-test ${DOCKER_IMAGE_NAME} bash -c 'sleep 1 && mysql -h mysql-test -u testuser -ptestpassword -e "show variables;" testdb'
 	docker stop mysql-test
 	docker rm mysql-test
+	# Test Case 2: test that it is possible to use "xxx_FILE" syntax
+	docker swarm init || true
+	docker service stop mysql-test2 || true
+	docker service rm mysql-test2 || true
+	docker secret rm mysql-test2-secret || true
+	## Next impl is OK if you run this test suite on a test VM, for instance. But it is NOK if run in CircleCI, as CircleCI execution is inside a docker container that use docker socket mount to share the docker server
+	## So volumes mounts won't be OK
+	# rm -rf tmp || true
+	# mkdir tmp
+	# echo "dummy_password" > tmp/password_file
+	# docker create --name mysql-test2 -v `pwd`/tmp/password_file:/tmp/root_password_file -v `pwd`/tmp/password_file:/tmp/user_password_file -e MYSQL_ROOT_PASSWORD_FILE=/tmp/root_password_file -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD_FILE=/tmp/user_password_file ${DOCKER_IMAGE_TAGNAME}
+	printf "dummy_password" | docker secret create mysql-test2-secret -
+	docker service create --name mysql-test2 --secret mysql-test2-secret -e MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql-test2-secret -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD_FILE=/run/secrets/mysql-test2-secret ${DOCKER_IMAGE_TAGNAME}
+	while ! (docker service logs mysql-test2 2>&1 | grep 'ready for connections') ; do sleep 1; done
+	docker service rm mysql-test2
+	docker secret rm mysql-test2-secret
+	#
+	docker ps -a
+	# rm -rf tmp
 
 tag-one-image: check
 	docker tag $(DOCKER_IMAGE_TAGNAME) $(DOCKER_REGISTRY)$(DOCKER_IMAGE_TAGNAME)
 
 push-one-image: check
-	docker push $(DOCKER_IMAGE_TAGNAME)
+	# push only is 'DOCKER_USERNAME' (and hopefully DOCKER_PASSWORD) are set:
+	if [[ ! "${DOCKER_USERNAME}" == "" ]]; then echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin; fi
+	if [[ ! "${DOCKER_USERNAME}" == "" ]]; then docker push "${DOCKER_IMAGE_TAGNAME}"; fi
 
 # Helper targets
 rmi-one-image: check
