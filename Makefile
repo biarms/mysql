@@ -33,12 +33,7 @@ default: all-images
 circleci-local-build:
 	circleci local execute
 
-# Call by travis for every build
 build: check-docker-login all-images create-and-push-manifests
-
-# Call by travis if branch <> master
-push: check-binaries
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push "biarms/mysql:latest"
 
 all-one-image-arm32v6: prepare
 	ARCH=arm32v6 LINUX_ARCH=armv6l  DOCKER_IMAGE_VERSION=${MYSQL_VERSION_ARM32V6} DOCKER_FILE='-f Dockerfile-arm32v6' make all-one-image
@@ -56,31 +51,31 @@ all-images: prepare all-one-image-arm32v6 all-one-image-arm32v7 all-one-image-ar
 
 create-and-push-manifests: #ideally, should reference 'all-images', but that's boring when we test this script...
 	# biarms/mysql:5.7.30
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create --amend "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}"
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" --os linux --arch arm --variant v7
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" --os linux --arch arm64 --variant v8
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}" --os linux --arch amd64
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}"
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create --amend "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}"
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" --os linux --arch arm --variant v7
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" --os linux --arch arm64 --variant v8
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}" --os linux --arch amd64
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}"
 	# biarms/mysql:5.7
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create --amend "biarms/mysql:5.7${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}"
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "biarms/mysql:5.7${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" --os linux --arch arm --variant v7
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "biarms/mysql:5.7${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" --os linux --arch arm64 --variant v8
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "biarms/mysql:5.7${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}" --os linux --arch amd64
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push "biarms/mysql:5.7${BETA_VERSION}"
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create --amend "${DOCKER_IMAGE_NAME}:5.7${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}"
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_IMAGE_NAME}:5.7${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" --os linux --arch arm --variant v7
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_IMAGE_NAME}:5.7${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" --os linux --arch arm64 --variant v8
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_IMAGE_NAME}:5.7${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}" --os linux --arch amd64
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push "${DOCKER_IMAGE_NAME}:5.7${BETA_VERSION}"
 	# biarms/mysql:5
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create --amend "biarms/mysql:5${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_ARM32V6}-linux-arm32v6${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}"
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "biarms/mysql:5${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_ARM32V6}-linux-arm32v6${BETA_VERSION}" --os linux --arch arm --variant v6
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "biarms/mysql:5${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" --os linux --arch arm --variant v7
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "biarms/mysql:5${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" --os linux --arch arm64 --variant v8
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "biarms/mysql:5${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}" --os linux --arch amd64
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push "biarms/mysql:5${BETA_VERSION}"
-	# biarms/mysql:latest
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create --amend "biarms/mysql:latest${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_ARM32V6}-linux-arm32v6${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}"
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "biarms/mysql:latest${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_ARM32V6}-linux-arm32v6${BETA_VERSION}" --os linux --arch arm --variant v6
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "biarms/mysql:latest${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" --os linux --arch arm --variant v7
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "biarms/mysql:latest${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" --os linux --arch arm64 --variant v8
-	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "biarms/mysql:latest${BETA_VERSION}" "biarms/mysql:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}" --os linux --arch amd64
-	# Don't push this image on purpose !
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create --amend "${DOCKER_IMAGE_NAME}:5${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_ARM32V6}-linux-arm32v6${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}"
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_IMAGE_NAME}:5${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_ARM32V6}-linux-arm32v6${BETA_VERSION}" --os linux --arch arm --variant v6
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_IMAGE_NAME}:5${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" --os linux --arch arm --variant v7
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_IMAGE_NAME}:5${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" --os linux --arch arm64 --variant v8
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_IMAGE_NAME}:5${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}" --os linux --arch amd64
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push "${DOCKER_IMAGE_NAME}:5${BETA_VERSION}"
+	# ${DOCKER_IMAGE_NAME}:latest
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create --amend "${DOCKER_IMAGE_NAME}:latest${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_ARM32V6}-linux-arm32v6${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}"
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_IMAGE_NAME}:latest${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_ARM32V6}-linux-arm32v6${BETA_VERSION}" --os linux --arch arm --variant v6
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_IMAGE_NAME}:latest${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" --os linux --arch arm --variant v7
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_IMAGE_NAME}:latest${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" --os linux --arch arm64 --variant v8
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_IMAGE_NAME}:latest${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}" --os linux --arch amd64
+	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push "biarms/mysql:latest${BETA_VERSION}"
 
 all-one-image: build-one-image test-one-image tag-one-image push-one-image
 
@@ -178,9 +173,11 @@ test-one-image: check
 tag-one-image: check
 	docker tag $(DOCKER_IMAGE_TAGNAME) $(DOCKER_REGISTRY)$(DOCKER_IMAGE_TAGNAME)
 
-push-one-image: check
-	# push only is 'DOCKER_USERNAME' (and hopefully DOCKER_PASSWORD) are set:
+docker-login-if-possible: check-binaries
 	if [[ ! "${DOCKER_USERNAME}" == "" ]]; then echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin; fi
+
+push-one-image: docker-login-if-possible
+	# push only is 'DOCKER_USERNAME' (and hopefully DOCKER_PASSWORD) are set:
 	if [[ ! "${DOCKER_USERNAME}" == "" ]]; then docker push "${DOCKER_IMAGE_TAGNAME}"; fi
 
 # Helper targets
