@@ -77,8 +77,7 @@ check-docker-login: check-binaries
 docker-login-if-possible: check-binaries
 	if [[ ! "${DOCKER_USERNAME}" == "" ]]; then echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin; fi
 
-
-prepare: check-build install-qemu
+prepare: check-build check install-qemu
 
 # Test are qemu based. SHOULD_DO: use `docker buildx bake`. See https://github.com/docker/buildx#buildx-bake-options-target
 install-qemu: check-binaries
