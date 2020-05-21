@@ -65,7 +65,6 @@ check-binaries:
 	@ echo "DOCKER_REGISTRY: ${DOCKER_REGISTRY}"
 	@ echo "BUILD_DATE: ${BUILD_DATE}"
 	@ echo "VCS_REF: ${VCS_REF}"
-	@ echo "DOCKER_IMAGE_TAGNAME: ${DOCKER_IMAGE_TAGNAME}"
 
 check-build: check-binaries
 	# Next line will fail if docker server can't be contacted
@@ -77,7 +76,7 @@ check-docker-login: check-binaries
 docker-login-if-possible: check-binaries
 	if [[ ! "${DOCKER_USERNAME}" == "" ]]; then echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin; fi
 
-prepare: check-build install-qemu
+prepare: check-build check install-qemu
 
 # Test are qemu based. SHOULD_DO: use `docker buildx bake`. See https://github.com/docker/buildx#buildx-bake-options-target
 install-qemu: check-binaries
@@ -112,22 +111,24 @@ check: check-binaries
         echo '    ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=5.7.30 make' && \
         exit -3; \
 	fi
+	# Debug info
+	@ echo "DOCKER_IMAGE_TAGNAME: ${DOCKER_IMAGE_TAGNAME}"
 
-build-all-images: prepare build-all-one-image-arm32v6 build-all-one-image-arm32v7 build-all-one-image-arm64v8 build-all-one-image-amd64 uninstall-qemu
+build-all-images: build-all-one-image-arm32v6 build-all-one-image-arm32v7 build-all-one-image-arm64v8 build-all-one-image-amd64 uninstall-qemu
 
 # Actually, the 'push' will only be done is DOCKER_USERNAME is set and not empty !
-build-all-one-image: build-one-image test-one-image tag-one-image push-one-image
+build-all-one-image: prepare build-one-image test-one-image push-one-image
 
-build-all-one-image-arm32v6: prepare
+build-all-one-image-arm32v6:
 	ARCH=arm32v6 LINUX_ARCH=armv6l  DOCKER_IMAGE_VERSION=${MYSQL_VERSION_ARM32V6} DOCKER_FILE='-f Dockerfile-arm32v6' make build-all-one-image
 
-build-all-one-image-arm32v7: prepare
+build-all-one-image-arm32v7:
 	ARCH=arm32v7 LINUX_ARCH=armv7l  DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make build-all-one-image
 
-build-all-one-image-arm64v8: prepare
+build-all-one-image-arm64v8:
 	ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make build-all-one-image
 
-build-all-one-image-amd64: prepare
+build-all-one-image-amd64:
 	ARCH=amd64   LINUX_ARCH=x86_64  DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make build-all-one-image
 
 create-and-push-manifests: #ideally, should reference 'all-images', but that's boring when we test this script...
@@ -158,9 +159,8 @@ create-and-push-manifests: #ideally, should reference 'all-images', but that's b
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_IMAGE_NAME}:latest${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}" --os linux --arch amd64
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push "${DOCKER_IMAGE_NAME}:latest${BETA_VERSION}"
 
-
 build-one-image: check
-	docker build -t ${DOCKER_REGISTRY}${DOCKER_IMAGE_TAGNAME} --build-arg VERSION="${DOCKER_IMAGE_VERSION}" --build-arg VCS_REF="${VCS_REF}" --build-arg BUILD_DATE="${BUILD_DATE}" --build-arg BUILD_ARCH="${BUILD_ARCH}" ${DOCKER_FILE} .
+	docker build -t ${DOCKER_IMAGE_TAGNAME} --build-arg VERSION="${DOCKER_IMAGE_VERSION}" --build-arg VCS_REF="${VCS_REF}" --build-arg BUILD_DATE="${BUILD_DATE}" --build-arg BUILD_ARCH="${BUILD_ARCH}" ${DOCKER_FILE} .
 
 test-one-image: check
 	# Smoke tests:
@@ -208,10 +208,7 @@ test-one-image: check
 	docker ps -a
 	# rm -rf tmp
 
-tag-one-image: check
-	docker tag $(DOCKER_IMAGE_TAGNAME) $(DOCKER_REGISTRY)$(DOCKER_IMAGE_TAGNAME)
-
-push-one-image: docker-login-if-possible
+push-one-image: check docker-login-if-possible
 	# push only is 'DOCKER_USERNAME' (and hopefully DOCKER_PASSWORD) are set:
 	if [[ ! "${DOCKER_USERNAME}" == "" ]]; then docker push "${DOCKER_IMAGE_TAGNAME}"; fi
 
