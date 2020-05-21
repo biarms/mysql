@@ -9,7 +9,7 @@ before_install:
   - sudo rm -rf /var/lib/apt/lists/*
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
   - lsb_release -cs
-  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) edge"
+  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
   - sudo apt-get update
   - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
   - docker version
@@ -22,7 +22,7 @@ before_install:
       echo "We are not building the master branch (or we are in a PR mode). Building a beta version then"
       BUILD_BETA_VERSION="-beta-travis" #${TRAVIS_BUILD_NUMBER}"
     fi
-  - echo "TRAVIS_BRANCH=${TRAVIS_BRANCH} - DOCKER_USERNAME=${DOCKER_USERNAME} - BETA_MODE=${BETA_MODE} - BUILD_BETA_VERSION=${BUILD_BETA_VERSION}"
+  - echo "TRAVIS_BRANCH=${TRAVIS_BRANCH} - DOCKER_USERNAME=${DOCKER_USERNAME} - BUILD_BETA_VERSION=${BUILD_BETA_VERSION}"
 
 script:
-  - BETA_VERSION=${BUILD_BETA_VERSION} make push
+  - BETA_VERSION=${BUILD_BETA_VERSION} make
