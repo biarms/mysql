@@ -3,7 +3,7 @@
 ARG BUILD_ARCH
 
 # Changed from original - end: don't inherit from debian:jessie, because mysql-server-5.7 don't exist on debian:jessie arm apt-get repo
-FROM ${BUILD_ARCH}ubuntu:bionic
+FROM ${BUILD_ARCH}ubuntu:trusty
 # Changed from original - end
 # Changed from original - start: add one line to override the maintainer
 MAINTAINER Brother In Arms <project.biarms@gmail.com>
@@ -16,7 +16,7 @@ RUN groupadd -r mysql && useradd -r -g mysql mysql
 # add gosu for easy step-down from root
 ENV GOSU_VERSION=1.12
 RUN set -x \
-	&& apt-get update && apt-get install -y --no-install-recommends ca-certificates wget gpg \
+	&& apt-get update && apt-get install -y --no-install-recommends ca-certificates wget \
 	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture | awk -F- '{ print $NF }')" \
 	&& chmod +x /usr/local/bin/gosu \
 	&& gosu nobody true \
@@ -25,6 +25,9 @@ RUN set -x \
 # Changed from original - end: upgrade to 1.12 and don't check asc file (was inspired by https://github.com/rothgar/rpi-wordpress/blob/master/mysql/Dockerfile)
 
 RUN mkdir /docker-entrypoint-initdb.d
+
+# RUN cat /etc/apt/sources.list
+# RUN cat /etc/apt/sources.list.d/ubuntu-esm-infra-trusty.list
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
 # for MYSQL_RANDOM_ROOT_PASSWORD
@@ -83,14 +86,22 @@ RUN { \
 
 VOLUME /var/lib/mysql
 
-ENV MYSQL_MAJOR 5.7
-ADD https://raw.githubusercontent.com/docker-library/mysql/master/${MYSQL_MAJOR}/docker-entrypoint.sh /usr/local/bin/
+# ENV MYSQL_MAJOR 5.5
+# ADD https://raw.githubusercontent.com/docker-library/mysql/master/${MYSQL_MAJOR}/docker-entrypoint.sh /usr/local/bin/
+# RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
+#  && chown mysql:mysql /usr/local/bin/docker-entrypoint.sh \
+#  && ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
+# # Changed from original - start: on ubuntu, /usr/local/bin is not in the path
+# ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+# # Changed from original - end: on ubuntu, /usr/local/bin is not in the path
+
+# ADD https://raw.githubusercontent.com/docker-library/mysql/master/${MYSQL_MAJOR}/docker-entrypoint.sh /usr/local/bin/
+COPY entrypoint-5.5.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
  && chown mysql:mysql /usr/local/bin/docker-entrypoint.sh \
  && ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
-# Changed from original - start: on ubuntu, /usr/local/bin is not in the path
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-# Changed from original - end: on ubuntu, /usr/local/bin is not in the path
+
 
 # Changed from original - start: add tzdata package to fix a timezone blocking issue at startup
 # (according to https://serverfault.com/questions/511821/how-to-update-install-zoneinfo-timezone-database-on-centos)
