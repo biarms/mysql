@@ -3,18 +3,9 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: ubuntu:bionic
+      - image: biarms/docker-toolbox:0.0.1
     steps:
       - setup_remote_docker:
           version: 18.09.3 # Max supported version was found on https://circleci.com/docs/2.0/building-docker-images/
-      - run: apt-get update
-      - run: apt-get install -y sudo curl make gnupg lsb-release software-properties-common git
-      - run: sudo rm -rf /var/lib/apt/lists/*
-      - run: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-      - run: lsb_release -cs
-      - run: sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) edge"
-      - run: sudo apt-get update
-      - run: sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
       - checkout
-      - run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
-      - run: BETA_VERSION='-circleci' make build
+      - run: BETA_VERSION='-beta-circleci' make

@@ -20,12 +20,11 @@ Image: mysql
 While
 ```
 # docker run --rm mplatform/mquery biarms/mysql:5
-Image: biarms/mysql:5.5
+Image: biarms/mysql:5
  * Manifest List: Yes
  * Supported platforms:
    - linux/arm/v6
    - linux/amd64
-   - linux/arm/v7
    - linux/arm64
 ```
 
@@ -35,140 +34,51 @@ As these docker images were created to mimic as much as possible the official my
 
 To pull this image from [docker hub/docker cloud](https://hub.docker.com/r/biarms/mysql/):
 ```
-$ docker pull biarms/mysql:5 # should get the correct arm images on any arm device
+$ docker pull biarms/mysql:5 # should get a working images on any arm device from v6 to v8
 ```
 
 Caution: 
-- like 'latest', the version 5 is a moving target: today, it gives 5.5.60 for armv6 devices, but 5.7.30 for other devices. Tomorrow, it could give 5.7.31.
-Be sure to always run the 'docker pull biarms/mysql:5' to get the latest images.
+- like 'latest', the version 5 is a moving target: today, it gives 5.5.60 for armv6 and armv7 devices, but 5.7.30 for arm64v8 and x86_64 devices. Tomorrow, it could give 5.7.31 !
+  Be sure to always run the 'docker pull biarms/mysql:5' to get the latest images.
+- Also notes that you don't get the same minor version according to the arm device you are using !
+    ```
+    Image: biarms/mysql:5
+     * Manifest List: Yes
+     * Supported platforms:
+       - linux/arm/v6  # => mysql version 5.5.60
+       - linux/amd64   # => mysql version 5.7.30
+       - linux/arm/v7  # => mysql version 5.7.30 designed for armv7 is not published because of docker 19.03 bug on 'rpi1', so you will get the 'armv6' version, which is 5.5.60. See https://github.com/biarms/mysql/issues/4 
+       - linux/arm64   # => mysql version 5.7.30
+    ```
+  In other words, `docker run -it --rm biarms/mysql:5 --version` will return:
+    1. '5.5.60' on arm32v6 devices
+    2. '5.5.60' on arm32v7 devices (because of our workaround about https://github.com/biarms/mysql/issues/4 issue)
+    3. '5.7.30' on arm64v8 devices
+    4. '5.7.30' on x86_64 devices
+- Be aware no arm32v6 image is build for the 5.7 and 5.7.30 releases ! In other words, `docker run --rm mplatform/mquery biarms/mysql:5.7.30` (as well as `docker run --rm mplatform/mquery biarms/mysql:5.7`) will return something similar to:
+    ``` 
+    Image: biarms/mysql:5.7.30
+     * Manifest List: Yes
+     * Supported platforms:
+       - linux/amd64    # => mysql version 5.7.30
+       - linux/arm/v7   # => mysql version 5.7.30
+       - linux/arm64    # => mysql version 5.7.30
+    ```
+  In other words, `docker run -it --rm biarms/mysql:5.7 --version` (or `docker run -it --rm biarms/mysql:5.7.30 --version`) will return 
+    1. nothing on arm32v6 devices (so it will not work on armv6 devices like rpi zero or rpi one)
+    2. '5.7.30' on arm32v7 devices (like Odroid, or rpi2, rpi3, rpi4 running a 32 bits OS)
+    3. '5.7.30' on arm64v8 devices (like rpi2, rpi3, rpi4 running a 64 bits OS)
+    4. '5.7.30' on x86_64 devices (like a MacOS, Linux or PC)
+
+## How to build locally:
+
+Thanks to CircleCi client: 
 ```
-Image: biarms/mysql:5
- * Manifest List: Yes
- * Supported platforms:
-   - linux/arm/v6  # => mysql version 5.5.60
-   - linux/amd64   # => mysql version 5.7.30
-   - linux/arm/v7  # => mysql version 5.7.30
-   - linux/arm64   # => mysql version 5.7.30
+circleci local execute -e DOCKER_USERNAME=******** -e DOCKER_PASSWORD=********
 ```
-- be aware no arm32v6 image is build for the release 5.7 ! In other words, `docker run --rm mplatform/mquery biarms/mysql:5.7.30` (as well as `docker run --rm mplatform/mquery biarms/mysql:5.7`) will return something similar to:
-``` 
-Image: biarms/mysql:5.7.30
- * Manifest List: Yes
- * Supported platforms:
-   - linux/amd64
-   - linux/arm/v7
-   - linux/arm64
+or
 ```
-
-## Tests of these images on different ARM boxes:
-
-### My (very very) simple test suite:
-```
-uname -a
-cat /etc/os-release
-docker run --rm -it biarms/mysql:5 uname -a
-docker run --rm -it biarms/mysql:5 --version
-docker run --rm -it biarms/mysql:5.5 --version
-docker run --rm -it biarms/mysql:5.7 --version
-docker run --rm -it biarms/mysql:5.7.30 --version
-```
-### Test results with a Odroid XU4 (a pure armv7l device):
-```
-$ uname -a
-Linux odroid 5.4.0-odroid-armmp #1 SMP PREEMPT Ubuntu 5.4.33-202004230334~focal (2020-04-22) armv7l armv7l armv7l GNU/Linux
-
-$ cat /etc/os-release
-NAME="Ubuntu"
-VERSION="20.04 LTS (Focal Fossa)"
-ID=ubuntu
-ID_LIKE=debian
-PRETTY_NAME="Ubuntu 20.04 LTS"
-VERSION_ID="20.04"
-HOME_URL="https://www.ubuntu.com/"
-SUPPORT_URL="https://help.ubuntu.com/"
-BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
-PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
-VERSION_CODENAME=focal
-UBUNTU_CODENAME=focal
-
-$ docker run --rm -it biarms/mysql:5 uname -a
-Linux 21206c44333b 5.4.0-odroid-armmp #1 SMP PREEMPT Ubuntu 5.4.33-202004230334~focal (2020-04-22) armv7l armv7l armv7l GNU/Linux
-
-$ docker run --rm -it biarms/mysql:5 --version
-mysqld  Ver 5.7.30-0ubuntu0.18.04.1 for Linux on armv7l ((Ubuntu))
-
-$ docker run --rm -it biarms/mysql:5.5 --version
-200515 22:00:03 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
-mysqld  Ver 5.5.61-0ubuntu0.14.04.1 for debian-linux-gnu on armv7l ((Ubuntu))
-
-$ docker run --rm -it biarms/mysql:5.7 --version
-mysqld  Ver 5.7.30-0ubuntu0.18.04.1 for Linux on armv7l ((Ubuntu))
-
-$ docker run --rm -it biarms/mysql:5.7.30 --version
-mysqld  Ver 5.7.30-0ubuntu0.18.04.1 for Linux on armv7l ((Ubuntu))
-```
-
-### Tests with a Raspberry PI 3 (running an ubuntu aarch64 OS):
-```
-$ uname -a
-Linux blue 5.4.0-1008-raspi #8-Ubuntu SMP Wed Apr 8 11:13:06 UTC 2020 aarch64 aarch64 aarch64 GNU/Linux
-
-$ cat /etc/os-release
-NAME="Ubuntu"
-VERSION="20.04 LTS (Focal Fossa)"
-ID=ubuntu
-ID_LIKE=debian
-PRETTY_NAME="Ubuntu 20.04 LTS"
-VERSION_ID="20.04"
-HOME_URL="https://www.ubuntu.com/"
-SUPPORT_URL="https://help.ubuntu.com/"
-BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
-PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
-VERSION_CODENAME=focal
-UBUNTU_CODENAME=focal
-
-$ docker run --rm -it biarms/mysql:5.5 uname -a
-Linux 07f3959ade48 5.4.0-1008-raspi #8-Ubuntu SMP Wed Apr 8 11:13:06 UTC 2020 aarch64 aarch64 aarch64 GNU/Linux
-
-$ docker run --rm -it biarms/mysql:5 --version
-mysqld  Ver 5.7.30-0ubuntu0.18.04.1 for Linux on aarch64 ((Ubuntu))
-
-$ docker run --rm -it biarms/mysql:5.5 --version
-200515 22:21:20 [Warning] Using unique option prefix key_buffer instead of key_buffer_size is deprecated and will be removed in a future release. Please use the full name instead.
-mysqld  Ver 5.5.61-0ubuntu0.14.04.1 for debian-linux-gnu on aarch64 ((Ubuntu))
-
-$ docker run --rm -it biarms/mysql:5.7 --version
-mysqld  Ver 5.7.30-0ubuntu0.18.04.1 for Linux on aarch64 ((Ubuntu))
-
-$ docker run --rm -it biarms/mysql:5.7.30 --version
-mysqld  Ver 5.7.30-0ubuntu0.18.04.1 for Linux on aarch64 ((Ubuntu))
-```
-
-### Tests on a x86_64 device:
-```
-$ uname -m
-x86_64
-
-$ docker run --rm -it biarms/mysql:5 uname -m
-x86_64
-
-$ docker run --rm -it biarms/mysql:5 --version
-mysqld  Ver 5.7.30-0ubuntu0.18.04.1 for Linux on x86_64 ((Ubuntu))
-
-$ docker run --rm -it biarms/mysql:5 bash -c 'cat /etc/*release' | grep 'VERSION='
-VERSION="18.04.4 LTS (Bionic Beaver)"
-
-$ docker run --rm -it biarms/mysql:5.5 --version
-Unable to find image 'biarms/mysql:5.5' locally
-5.5: Pulling from biarms/mysql
-docker: no matching manifest for linux/amd64 in the manifest list entries.
-See 'docker run --help'.
-
-$ docker run --rm -it biarms/mysql:5.7 --version
-mysqld  Ver 5.7.30-0ubuntu0.18.04.1 for Linux on x86_64 ((Ubuntu))
-
-$ docker run --rm -it biarms/mysql:5.7.30 --version
-mysqld  Ver 5.7.30-0ubuntu0.18.04.1 for Linux on x86_64 ((Ubuntu))
+DOCKER_USERNAME=******** DOCKER_PASSWORD=******** make circleci-local-build
 ```
 
 ## Misc references:
