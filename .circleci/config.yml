@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: biarms/docker-toolbox:0.0.1
+      - image: biarms/docker-toolbox:0.0.2
     steps:
       - setup_remote_docker:
           version: 19.03.8 # Max supported version was found on https://circleci.com/docs/2.0/building-docker-images/
