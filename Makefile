@@ -46,14 +46,14 @@ BUILD_ARCH = $(ARCH)/
 # | arm64v8 |   aarch64  |
 # |---------|------------|
 
-default: all
+default: install-qemu test-arm64v8 uninstall-qemu
 
 all: check-docker-login build all-manifests generate-test-suite
 
 build: build-all-images
 
 # Launch a local build as on circleci, that will call the default target, but inside the 'circleci build and test env'
-circleci-local-build: check-docker-login
+circleci-local-build:
 	@ circleci local execute -e DOCKER_USERNAME="${DOCKER_USERNAME}" -e DOCKER_PASSWORD="${DOCKER_PASSWORD}"
 
 check-binaries:
@@ -139,6 +139,9 @@ build-all-one-image-arm32v7:
 
 build-all-one-image-arm64v8-5.5:
 	ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=${MYSQL_VERSION_5_5} DOCKER_FILE='-f Dockerfile-5.5' make build-all-one-image
+
+test-arm64v8:
+	ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make test-one-image
 
 build-all-one-image-arm64v8:
 	ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make build-all-one-image
