@@ -8,4 +8,4 @@ jobs:
       - setup_remote_docker:
           version: 19.03.8 # Max supported version was found on https://circleci.com/docs/2.0/building-docker-images/
       - checkout
-      - run: BETA_VERSION='-beta-circleci' make
+      - run: make
