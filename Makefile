@@ -319,13 +319,11 @@ test-one-image: check
 	# mkdir tmp
 	# echo "dummy_password" > tmp/password_file
 	# docker create --name mysql-test2 -v `pwd`/tmp/password_file:/tmp/root_password_file -v `pwd`/tmp/password_file:/tmp/user_password_file -e MYSQL_ROOT_PASSWORD_FILE=/tmp/root_password_file -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD_FILE=/tmp/user_password_file ${DOCKER_IMAGE_TAGNAME}
-# The test of "biarms/mysql:5.7.30-linux-arm64v8-beta-circleci" produce a "no suitable node (unsupported platform on 1 node)" error, quite similar to https://github.com/docker/swarmkit/issues/2401..., but only on CircleCI. There is no issue on Travis !
-# Let's skip this tests globally :( . See https://github.com/biarms/mysql/issues/3
-#	printf "dummy_password" | docker secret create mysql-test2-secret -
-#	docker service create --name mysql-test2 --secret mysql-test2-secret -e MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql-test2-secret -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD_FILE=/run/secrets/mysql-test2-secret ${DOCKER_IMAGE_TAGNAME}
-#	while ! (docker service logs mysql-test2 2>&1 | grep 'ready for connections') ; do sleep 1; done
-#	docker service rm mysql-test2
-#	docker secret rm mysql-test2-secret
+	printf "dummy_password" | docker secret create mysql-test2-secret -
+	docker service create --name mysql-test2 --secret mysql-test2-secret -e MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql-test2-secret -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD_FILE=/run/secrets/mysql-test2-secret ${DOCKER_IMAGE_TAGNAME}
+	while ! (docker service logs mysql-test2 2>&1 | grep 'ready for connections') ; do sleep 1; done
+	docker service rm mysql-test2
+	docker secret rm mysql-test2-secret
 	#
 	docker ps -a
 	# rm -rf tmp
