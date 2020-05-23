@@ -6,6 +6,6 @@ jobs:
       - image: biarms/docker-toolbox:0.0.1
     steps:
       - setup_remote_docker:
-          version: 18.09.3 # Max supported version was found on https://circleci.com/docs/2.0/building-docker-images/
+          version: 19.03.8 # Max supported version was found on https://circleci.com/docs/2.0/building-docker-images/
       - checkout
       - run: BETA_VERSION='-beta-circleci' make
