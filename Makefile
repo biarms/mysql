@@ -58,7 +58,14 @@ test-tc-2: install-qemu setup-swarm debug-env
 	echo "Wait that mysql is started"
 	i=0 ;\
 	timeout=0 ;\
-	while ! (docker service logs mysql-test2 2>&1 | grep 'ready for connections') ; \
+	while true ; \
+	  if docker service logs mysql-test2 | grep -q 'ready for connections' ; then \
+	    echo "Logs are OK, continue"; \
+	    break; \
+	  else \
+	    echo "Logs are still NOK"; \
+	    docker service logs mysql-test2; \
+	  fi; \
 	  i=$$[$$i+1]; \
 	  echo "i:$$i"; \
 	  if [ $$i -gt 60 ]; then \
