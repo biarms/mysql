@@ -61,8 +61,9 @@ test-tc-2: install-qemu setup-swarm debug-env
 	while ! (docker service logs mysql-test2 2>&1 | grep 'ready for connections') ; \
 	  i=$$[$$i+1]; \
 	  echo "i:$$i"; \
-	  if [ $$i -gt 30 ]; then \
+	  if [ $$i -gt 15 ]; then \
 	    timeout=1 ; \
+	  	echo "Timeout !!! TC will fail (after service inspection and cleanup...)"; \
 	  	break; \
   	  fi; \
 	  do sleep 1; \
@@ -76,7 +77,7 @@ test-tc-2: install-qemu setup-swarm debug-env
 	docker ps -a ;\
 	if [[ $$timeout -eq 1 ]]; then \
 	  echo "TC failed because of timeout !"; \
-	  exit -5; \
+	  exit -2; \
 	else \
 	  echo "Service was started and work as expected !"; \
 	fi
