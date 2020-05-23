@@ -20,6 +20,12 @@ setup-swarm:
 	docker swarm leave --force || true
 	docker swarm init
 
+hack-swarm-node:
+	test $$(docker node ls | wc -l) = 2
+	NODE_ID=$$(docker node ls | grep Leader | cut -d ' ' -f1) ;\
+	  echo NODE_ID=$$NODE_ID ;\
+	  docker node inspect $$NODE_ID
+
 debug-env:
 	echo "IMAGE: ${DOCKER_IMAGE_TAGNAME}"
 	uname -a
@@ -30,10 +36,12 @@ debug-env:
 	docker node ls
 	# Check that previous command returns only 2 lines
 	test $$(docker node ls | wc -l) = 2
-	docker node ls | grep Leader | cut -d ' ' -f1 | xargs docker node inspect
+	NODE_ID=$$(docker node ls | grep Leader | cut -d ' ' -f1) ;\
+	  echo NODE_ID=$$NODE_ID ;\
+	  docker node inspect $$NODE_ID
 	docker ps -a
 	docker images
-	docker pull ${DOCKER_IMAGE_TAGNAME}
+	# docker pull ${DOCKER_IMAGE_TAGNAME}
 	docker image inspect ${DOCKER_IMAGE_TAGNAME}
 
 test-tc-2: install-qemu setup-swarm debug-env
