@@ -1,16 +1,4 @@
 SHELL = bash
-# .ONESHELL:
-# .SHELLFLAGS = -e
-# See https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html
-.PHONY: default all build circleci-local-build check-binaries check-buildx check-docker-login docker-login-if-possible buildx-prepare \
-        buildx * TODO
-
-## Caution: this Makefile has 'multiple entries', which means that it is 'calling himself'.
-# For instance, if you call 'make circleci-local-build':
-# 1. CircleCi cli is invoked
-# 2. After have installed a build environment (inside a docker container), CircleCI will call "make" without parameter, which correspond to a 'make build-all-images' build (because of default target)
-# 3. And 'build-all-images' target will run 4 times the "make all-one-image" for 4 different architecture (arm32v6, arm32v7, arm64v8 and amd64).
-# Inspired from https://github.com/hypriot/rpi-mysql/blob/master/Makefile
 
 # DOCKER_REGISTRY: Nothing, or 'registry:5000/'
 DOCKER_REGISTRY ?= docker.io/
@@ -46,7 +34,7 @@ BUILD_ARCH = $(ARCH)/
 # | arm64v8 |   aarch64  |
 # |---------|------------|
 
-default: install-qemu test-arm64v8
+default: run-tc-2-for-arm64v8
 
 all: check-docker-login build all-manifests generate-test-suite
 
@@ -139,9 +127,6 @@ build-all-one-image-arm32v7:
 
 build-all-one-image-arm64v8-5.5:
 	ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=${MYSQL_VERSION_5_5} DOCKER_FILE='-f Dockerfile-5.5' make build-all-one-image
-
-test-arm64v8:
-	ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make test-one-image
 
 build-all-one-image-arm64v8:
 	ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make build-all-one-image
@@ -335,6 +320,9 @@ test-tc-2: check
 	#
 	docker ps -a
 	# rm -rf tmp
+
+run-tc-2-for-arm64v8: install-qemu
+	ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make test-tc-2
 
 test-one-image: test-run-smoke-tests test-tc-1 test-tc-2
 
