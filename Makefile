@@ -49,9 +49,16 @@ test-tc-2: install-qemu setup-swarm debug-env
 	docker service rm mysql-test2 || true
 	docker secret rm mysql-test2-secret || true
 	printf "dummy_password" | docker secret create mysql-test2-secret -
-	docker service create --name mysql-test2 --secret mysql-test2-secret -e MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql-test2-secret -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD_FILE=/run/secrets/mysql-test2-secret ${DOCKER_IMAGE_TAGNAME}
+	echo "Launch the service in background to be able to analyse the service..."
+	docker service create --name mysql-test2 --secret mysql-test2-secret -e MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql-test2-secret -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD_FILE=/run/secrets/mysql-test2-secret ${DOCKER_IMAGE_TAGNAME} &
+	echo "Wait a bit..."
+	sleep 3
+	echo "Then Continue"
 	docker service inspect mysql-test2
-	docker service inspect mysql-test2 | grep "Architecture"
+	echo "Next"
+	docker service inspect mysql-test2 | grep "Architecture" || true
+	# Diff between Travis and CircleCI: the 'Architecture' is set for CircleCI, but not for Travis !
+	echo "Wait"
 	while ! (docker service logs mysql-test2 2>&1 | grep 'ready for connections') ; do sleep 1; done
 	docker service logs mysql-test2
 	docker service rm mysql-test2
