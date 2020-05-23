@@ -46,7 +46,7 @@ BUILD_ARCH = $(ARCH)/
 # | arm64v8 |   aarch64  |
 # |---------|------------|
 
-default: test-arm64v8
+default: install-qemu test-arm64v8
 
 all: check-docker-login build all-manifests generate-test-suite
 
@@ -287,7 +287,8 @@ generate-test-suite:
 build-one-image: check
 	docker build -t ${DOCKER_IMAGE_TAGNAME} --build-arg VERSION="${DOCKER_IMAGE_VERSION}" --build-arg VCS_REF="${VCS_REF}" --build-arg BUILD_DATE="${BUILD_DATE}" --build-arg BUILD_ARCH="${BUILD_ARCH}" ${DOCKER_FILE} .
 
-test-one-image: check
+
+test-run-smoke-tests: check
 	# Smoke tests:
 	docker run --rm ${DOCKER_IMAGE_TAGNAME} /bin/echo "Success."
 	docker run --rm ${DOCKER_IMAGE_TAGNAME} uname -a
@@ -300,6 +301,8 @@ test-one-image: check
 	# on armv6l, it will return 'armv7l'...
 	# docker run --rm ${DOCKER_IMAGE_NAME} mysql --version | grep "${LINUX_ARCH}"
 	# docker run --rm ${DOCKER_IMAGE_NAME} mysqld --version | grep "${LINUX_ARCH}"
+
+test-tc-1: check
 	# Test Case 1: test that MYSQL starts
 	docker stop mysql-test || true
 	docker rm mysql-test || true
@@ -312,6 +315,8 @@ test-one-image: check
 	# docker run --rm -it --link mysql-test ${DOCKER_IMAGE_NAME} bash -c 'sleep 1 && mysql -h mysql-test -u testuser -ptestpassword -e "show variables;" testdb'
 	docker stop mysql-test
 	docker rm mysql-test
+
+test-tc-2: check
 	# Test Case 2: test that it is possible to use "xxx_FILE" syntax
 	docker swarm init || true
 	docker service rm mysql-test2 || true
@@ -330,6 +335,8 @@ test-one-image: check
 	#
 	docker ps -a
 	# rm -rf tmp
+
+test-one-image: test-run-smoke-tests test-tc-1 test-tc-2
 
 push-one-image: check docker-login-if-possible
 	# push only is 'DOCKER_USERNAME' (and hopefully DOCKER_PASSWORD) are set:
