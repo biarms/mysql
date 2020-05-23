@@ -282,7 +282,7 @@ generate-test-suite:
 	echo "Done. See the file 'testSuite.sh'"
 
 build-one-image: check
-	docker build -t ${DOCKER_IMAGE_TAGNAME} --build-arg VERSION="${DOCKER_IMAGE_VERSION}" --build-arg VCS_REF="${VCS_REF}" --build-arg BUILD_DATE="${BUILD_DATE}" --build-arg BUILD_ARCH="${BUILD_ARCH}" ${DOCKER_FILE} .
+	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build -t ${DOCKER_IMAGE_TAGNAME} --build-arg VERSION="${DOCKER_IMAGE_VERSION}" --build-arg VCS_REF="${VCS_REF}" --build-arg BUILD_DATE="${BUILD_DATE}" --build-arg BUILD_ARCH="${BUILD_ARCH}" ${DOCKER_FILE} .
 
 test-one-image: check
 	# Smoke tests:
