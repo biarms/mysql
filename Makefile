@@ -46,7 +46,7 @@ BUILD_ARCH = $(ARCH)/
 # | arm64v8 |   aarch64  |
 # |---------|------------|
 
-default: install-qemu test-arm64v8 uninstall-qemu
+default: test-arm64v8
 
 all: check-docker-login build all-manifests generate-test-suite
 
