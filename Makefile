@@ -41,7 +41,7 @@ debug-env:
 	  docker node inspect $$NODE_ID
 	docker ps -a
 	docker images
-	# docker pull ${DOCKER_IMAGE_TAGNAME}
+	docker pull ${DOCKER_IMAGE_TAGNAME}
 	docker image inspect ${DOCKER_IMAGE_TAGNAME}
 
 test-tc-2: install-qemu setup-swarm debug-env
