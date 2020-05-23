@@ -51,19 +51,34 @@ test-tc-2: install-qemu setup-swarm debug-env
 	printf "dummy_password" | docker secret create mysql-test2-secret -
 	echo "Launch the service in background to be able to analyse the service..."
 	docker service create --name mysql-test2 --secret mysql-test2-secret -e MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql-test2-secret -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD_FILE=/run/secrets/mysql-test2-secret ${DOCKER_IMAGE_TAGNAME} &
-	echo "Wait a bit..."
-	sleep 3
-	echo "Then Continue"
-	docker service inspect mysql-test2
-	echo "Next"
-	docker service inspect mysql-test2 | grep "Architecture" || true
+	#echo "Wait a bit (we want to inspect Travis when service is up and running...)"
+	#sleep 10
+	#echo "Then Continue"
 	# Diff between Travis and CircleCI: the 'Architecture' is set for CircleCI, but not for Travis !
-	echo "Wait"
-	while ! (docker service logs mysql-test2 2>&1 | grep 'ready for connections') ; do sleep 1; done
-	docker service logs mysql-test2
-	docker service rm mysql-test2
-	docker secret rm mysql-test2-secret
-	#
-	docker ps -a
+	echo "Wait that mysql is started"
+	i=0 ;\
+	timeout=0 ;\
+	while ! (docker service logs mysql-test2 2>&1 | grep 'ready for connections') ; \
+	  i=$$[$$i+1]; \
+	  echo "i:$$i"; \
+	  if [ $$i -gt 30 ]; then \
+	    timeout=1 ; \
+	  	break; \
+  	  fi; \
+	  do sleep 1; \
+	done; \
+	docker service ls ;\
+	docker service inspect mysql-test2 ;\
+	docker service inspect mysql-test2 | grep "Architecture" || true ;\
+	docker service logs mysql-test2 ;\
+	docker service rm mysql-test2 ;\
+	docker secret rm mysql-test2-secret ;\
+	docker ps -a ;\
+	if [[ $$timeout -eq 1 ]]; then \
+	  echo "TC failed because of timeout !"; \
+	  exit -5; \
+	else \
+	  echo "Service was started and work as expected !"; \
+	fi
 	# rm -rf tmp
 
