@@ -8,8 +8,8 @@ SHELL = bash
 ## Caution: this Makefile has 'multiple entries', which means that it is 'calling himself'.
 # For instance, if you call 'make circleci-local-build':
 # 1. CircleCi cli is invoked
-# 2. After have installed a build environment (inside a docker container), CircleCI will call "make" without parameter, which correspond to a 'make build-all-images' build (because of default target)
-# 3. And 'build-all-images' target will run 4 times the "make all-one-image" for 4 different architecture (arm32v6, arm32v7, arm64v8 and amd64).
+# 2. After have installed a build environment (inside a docker container), CircleCI will call "make" without parameter, which correspond to a 'make all' build (because of default target)
+# 3. And the 'all' target will run 4 times the "make all-one-image" for 4 different architecture (arm32v6, arm32v7, arm64v8 and amd64), via the 'build-all-images' target.
 # Inspired from https://github.com/hypriot/rpi-mysql/blob/master/Makefile
 
 # DOCKER_REGISTRY: Nothing, or 'registry:5000/'
