@@ -282,9 +282,9 @@ generate-test-suite:
 	echo "Done. See the file 'testSuite.sh'"
 
 build-one-image: check
-	DOCKER_CLI_EXPERIMENTAL=enabled docker buildx build -t ${DOCKER_IMAGE_TAGNAME} --build-arg VERSION="${DOCKER_IMAGE_VERSION}" --build-arg VCS_REF="${VCS_REF}" --build-arg BUILD_DATE="${BUILD_DATE}" --build-arg BUILD_ARCH="${BUILD_ARCH}" ${DOCKER_FILE} .
+	DOCKER_CLI_EXPERIMENTAL=enabled docker build -t ${DOCKER_IMAGE_TAGNAME} --build-arg VERSION="${DOCKER_IMAGE_VERSION}" --build-arg VCS_REF="${VCS_REF}" --build-arg BUILD_DATE="${BUILD_DATE}" --build-arg BUILD_ARCH="${BUILD_ARCH}" ${DOCKER_FILE} .
 
-test-one-image: check
+run-smoke-tests: check
 	# Smoke tests:
 	docker run --rm ${DOCKER_IMAGE_TAGNAME} /bin/echo "Success."
 	docker run --rm ${DOCKER_IMAGE_TAGNAME} uname -a
@@ -297,6 +297,8 @@ test-one-image: check
 	# on armv6l, it will return 'armv7l'...
 	# docker run --rm ${DOCKER_IMAGE_NAME} mysql --version | grep "${LINUX_ARCH}"
 	# docker run --rm ${DOCKER_IMAGE_NAME} mysqld --version | grep "${LINUX_ARCH}"
+
+run-tc-01: check
 	# Test Case 1: test that MYSQL starts
 	docker stop mysql-test || true
 	docker rm mysql-test || true
@@ -309,6 +311,8 @@ test-one-image: check
 	# docker run --rm -it --link mysql-test ${DOCKER_IMAGE_NAME} bash -c 'sleep 1 && mysql -h mysql-test -u testuser -ptestpassword -e "show variables;" testdb'
 	docker stop mysql-test
 	docker rm mysql-test
+
+run-tc-02: check
 	# Test Case 2: test that it is possible to use "xxx_FILE" syntax
 	docker swarm init || true
 	docker service rm mysql-test2 || true
@@ -327,6 +331,12 @@ test-one-image: check
 	#
 	docker ps -a
 	# rm -rf tmp
+
+# Disable tc-02 because of issue #3 :(
+test-one-image: run-smoke-tests run-tc-01 # run-tc-02
+
+run-tc-2-for-arm64v8: install-qemu
+	ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make run-tc-02
 
 push-one-image: check docker-login-if-possible
 	# push only is 'DOCKER_USERNAME' (and hopefully DOCKER_PASSWORD) are set:
