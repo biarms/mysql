@@ -1,0 +1,460 @@
+docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+Unable to find image 'multiarch/qemu-user-static:latest' locally
+latest: Pulling from multiarch/qemu-user-static
+
+e2334dd9fee4: Pulling fs layer 
+9af49f645bc8: Pulling fs layer 
+ed8a5179ae11: Pulling fs layer 
+1ec39da9c97d: Pulling fs layer 
+19b0574c3a7f: Pulling fs layer 1ec39da9c97d: Waiting 19b0574c3a7f: Waiting e2334dd9fee4: Downloading  8.214kB/760.9kBed8a5179ae11: Downloading     424B/3.091kBed8a5179ae11: Downloading  3.091kB/3.091kBed8a5179ae11: Verifying Checksum ed8a5179ae11: Download complete 9af49f645bc8: Downloading     388B/388B9af49f645bc8: Verifying Checksum 9af49f645bc8: Download complete e2334dd9fee4: Verifying Checksum e2334dd9fee4: Download complete e2334dd9fee4: Extracting  32.77kB/760.9kBe2334dd9fee4: Extracting  760.9kB/760.9kBe2334dd9fee4: Pull complete 9af49f645bc8: Extracting     388B/388B9af49f645bc8: Extracting     388B/388B1ec39da9c97d: Downloading     424B/3.09kB1ec39da9c97d: Downloading   3.09kB/3.09kB1ec39da9c97d: Verifying Checksum 1ec39da9c97d: Download complete 19b0574c3a7f: Downloading  522.7kB/50.89MB9af49f645bc8: Pull complete ed8a5179ae11: Extracting  3.091kB/3.091kBed8a5179ae11: Extracting  3.091kB/3.091kB19b0574c3a7f: Downloading  10.37MB/50.89MBed8a5179ae11: Pull complete 19b0574c3a7f: Downloading  21.29MB/50.89MB1ec39da9c97d: Extracting   3.09kB/3.09kB1ec39da9c97d: Extracting   3.09kB/3.09kB19b0574c3a7f: Downloading  32.21MB/50.89MB1ec39da9c97d: Pull complete 19b0574c3a7f: Downloading  44.12MB/50.89MB19b0574c3a7f: Verifying Checksum 19b0574c3a7f: Download complete 19b0574c3a7f: Extracting  524.3kB/50.89MB19b0574c3a7f: Extracting  4.194MB/50.89MB19b0574c3a7f: Extracting  7.864MB/50.89MB19b0574c3a7f: Extracting  11.53MB/50.89MB19b0574c3a7f: Extracting   15.2MB/50.89MB19b0574c3a7f: Extracting  18.87MB/50.89MB19b0574c3a7f: Extracting  22.54MB/50.89MB19b0574c3a7f: Extracting  26.21MB/50.89MB19b0574c3a7f: Extracting  30.41MB/50.89MB19b0574c3a7f: Extracting  34.08MB/50.89MB19b0574c3a7f: Extracting  37.75MB/50.89MB19b0574c3a7f: Extracting  41.42MB/50.89MB19b0574c3a7f: Extracting  45.09MB/50.89MB19b0574c3a7f: Extracting  49.28MB/50.89MB19b0574c3a7f: Extracting  50.89MB/50.89MB19b0574c3a7f: Pull complete Digest: sha256:c4bbb826aff01aacd5c73bc29401751ef045d8f0ed05f067aab1ce1072db20f0
+Status: Downloaded newer image for multiarch/qemu-user-static:latest
+Setting /usr/bin/qemu-alpha-static as binfmt interpreter for alpha
+Setting /usr/bin/qemu-arm-static as binfmt interpreter for arm
+Setting /usr/bin/qemu-armeb-static as binfmt interpreter for armeb
+Setting /usr/bin/qemu-sparc-static as binfmt interpreter for sparc
+Setting /usr/bin/qemu-sparc32plus-static as binfmt interpreter for sparc32plus
+Setting /usr/bin/qemu-sparc64-static as binfmt interpreter for sparc64
+Setting /usr/bin/qemu-ppc-static as binfmt interpreter for ppc
+Setting /usr/bin/qemu-ppc64-static as binfmt interpreter for ppc64
+Setting /usr/bin/qemu-ppc64le-static as binfmt interpreter for ppc64le
+Setting /usr/bin/qemu-m68k-static as binfmt interpreter for m68k
+Setting /usr/bin/qemu-mips-static as binfmt interpreter for mips
+Setting /usr/bin/qemu-mipsel-static as binfmt interpreter for mipsel
+Setting /usr/bin/qemu-mipsn32-static as binfmt interpreter for mipsn32
+Setting /usr/bin/qemu-mipsn32el-static as binfmt interpreter for mipsn32el
+Setting /usr/bin/qemu-mips64-static as binfmt interpreter for mips64
+Setting /usr/bin/qemu-mips64el-static as binfmt interpreter for mips64el
+Setting /usr/bin/qemu-sh4-static as binfmt interpreter for sh4
+Setting /usr/bin/qemu-sh4eb-static as binfmt interpreter for sh4eb
+Setting /usr/bin/qemu-s390x-static as binfmt interpreter for s390x
+Setting /usr/bin/qemu-aarch64-static as binfmt interpreter for aarch64
+Setting /usr/bin/qemu-aarch64_be-static as binfmt interpreter for aarch64_be
+Setting /usr/bin/qemu-hppa-static as binfmt interpreter for hppa
+Setting /usr/bin/qemu-riscv32-static as binfmt interpreter for riscv32
+Setting /usr/bin/qemu-riscv64-static as binfmt interpreter for riscv64
+Setting /usr/bin/qemu-xtensa-static as binfmt interpreter for xtensa
+Setting /usr/bin/qemu-xtensaeb-static as binfmt interpreter for xtensaeb
+Setting /usr/bin/qemu-microblaze-static as binfmt interpreter for microblaze
+Setting /usr/bin/qemu-microblazeel-static as binfmt interpreter for microblazeel
+Setting /usr/bin/qemu-or1k-static as binfmt interpreter for or1k
+docker swarm leave --force || true
+Error response from daemon: This node is not part of a swarm
+docker swarm init
+Swarm initialized: current node (ty8cpkub0naaoxabjvm31asiz) is now a manager.
+
+To add a worker to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-2re80i3i7xuynq9erlvncbflkwxc2vl8y0tgk5jyxtsf4ti0qt-cckacs6g7rpyrpr6cpe84ehzg 10.128.0.9:2377
+
+To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+
+echo "IMAGE: docker.io/******/mysql:5.7.30-linux-arm64v8"
+IMAGE: docker.io/******/mysql:5.7.30-linux-arm64v8
+uname -a
+Linux 313b922ea7e7 4.15.0-1052-aws #54-Ubuntu SMP Tue Oct 1 15:43:26 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
+cat /etc/*release || true # to avoid failure on mac
+DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=18.04
+DISTRIB_CODENAME=bionic
+DISTRIB_DESCRIPTION="Ubuntu 18.04.4 LTS"
+NAME="Ubuntu"
+VERSION="18.04.4 LTS (Bionic Beaver)"
+ID=ubuntu
+ID_LIKE=debian
+PRETTY_NAME="Ubuntu 18.04.4 LTS"
+VERSION_ID="18.04"
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+VERSION_CODENAME=bionic
+UBUNTU_CODENAME=bionic
+# cat /proc/cpuinfo || true # to avoid failure on mac
+docker version
+Client: Docker Engine - Community
+ Version:           19.03.9
+ API version:       1.40
+ Go version:        go1.13.10
+ Git commit:        9d988398e7
+ Built:             Fri May 15 00:25:18 2020
+ OS/Arch:           linux/amd64
+ Experimental:      false
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          19.03.8
+  API version:      1.40 (minimum version 1.12)
+  Go version:       go1.12.17
+  Git commit:       afacb8b7f0
+  Built:            Wed Mar 11 01:24:30 2020
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          1.2.13
+  GitCommit:        7ad184331fa3e55e52b890ea95e65ba581ae3429
+ runc:
+  Version:          1.0.0-rc10
+  GitCommit:        dc9208a3303feef5b3839f4323d9beb36df0a9dd
+ docker-init:
+  Version:          0.18.0
+  GitCommit:        fec3683
+docker info
+Client:
+ Debug Mode: false
+
+Server:
+ Containers: 0
+  Running: 0
+  Paused: 0
+  Stopped: 0
+ Images: 1
+ Server Version: 19.03.8
+ Storage Driver: aufs
+  Root Dir: /var/lib/docker/aufs
+  Backing Filesystem: extfs
+  Dirs: 5
+  Dirperm1 Supported: true
+ Logging Driver: json-file
+ Cgroup Driver: cgroupfs
+ Plugins:
+  Volume: local
+  Network: bridge host ipvlan macvlan null overlay
+  Log: awslogs fluentd gcplogs gelf journald json-file local logentries splunk syslog
+ Swarm: active
+  NodeID: ty8cpkub0naaoxabjvm31asiz
+  Is Manager: true
+  ClusterID: rljqmfspw5z3yuh7encliaxsx
+  Managers: 1
+  Nodes: 1
+  Default Address Pool: 10.0.0.0/8  
+  SubnetSize: 24
+  Data Path Port: 4789
+  Orchestration:
+   Task History Retention Limit: 5
+  Raft:
+   Snapshot Interval: 10000
+   Number of Old Snapshots to Retain: 0
+   Heartbeat Tick: 1
+   Election Tick: 10
+  Dispatcher:
+   Heartbeat Period: 5 seconds
+  CA Configuration:
+   Expiry Duration: 3 months
+   Force Rotate: 0
+  Autolock Managers: false
+  Root Rotation In Progress: false
+  Node Address: 10.128.0.9
+  Manager Addresses:
+   10.128.0.9:2377
+ Runtimes: runc
+ Default Runtime: runc
+ Init Binary: docker-init
+ containerd version: 7ad184331fa3e55e52b890ea95e65ba581ae3429
+ runc version: dc9208a3303feef5b3839f4323d9beb36df0a9dd
+ init version: fec3683
+ Security Options:
+  apparmor
+  seccomp
+   Profile: default
+ Kernel Version: 4.15.0-1027-gcp
+ Operating System: Ubuntu 16.04.5 LTS
+ OSType: linux
+ Architecture: x86_64
+ CPUs: 2
+ Total Memory: 7.298GiB
+ Name: default-f8aa69c0-00ee-46fb-912e-c8873d816918
+ ID: RIUS:Y5MJ:LBND:PX7J:GQTY:YP5X:AJTW:D6A4:ZDLY:H7XD:ICN2:RU7P
+ Docker Root Dir: /var/lib/docker
+ Debug Mode: false
+ Registry: https://index.docker.io/v1/
+ Labels:
+  provider=generic
+ Experimental: false
+ Insecure Registries:
+  127.0.0.0/8
+ Live Restore Enabled: false
+
+WARNING: No swap limit support
+WARNING: the aufs storage-driver is deprecated, and will be removed in a future release.
+docker node ls
+ID                            HOSTNAME                                       STATUS              AVAILABILITY        MANAGER STATUS      ENGINE VERSION
+ty8cpkub0naaoxabjvm31asiz *   default-f8aa69c0-00ee-46fb-912e-c8873d816918   Ready               Active              Leader              19.03.8
+# Check that previous command returns only 2 lines
+test $(docker node ls | wc -l) = 2
+docker node ls | grep Leader | cut -d ' ' -f1 | xargs docker node inspect
+[
+    {
+        "ID": "ty8cpkub0naaoxabjvm31asiz",
+        "Version": {
+            "Index": 9
+        },
+        "CreatedAt": "2020-05-23T13:46:17.728017596Z",
+        "UpdatedAt": "2020-05-23T13:46:18.235177001Z",
+        "Spec": {
+            "Labels": {},
+            "Role": "manager",
+            "Availability": "active"
+        },
+        "Description": {
+            "Hostname": "default-f8aa69c0-00ee-46fb-912e-c8873d816918",
+            "Platform": {
+                "Architecture": "x86_64",
+                "OS": "linux"
+            },
+            "Resources": {
+                "NanoCPUs": 2000000000,
+                "MemoryBytes": 7835996160
+            },
+            "Engine": {
+                "EngineVersion": "19.03.8",
+                "Labels": {
+                    "provider": "generic"
+                },
+                "Plugins": [
+                    {
+                        "Type": "Log",
+                        "Name": "awslogs"
+                    },
+                    {
+                        "Type": "Log",
+                        "Name": "fluentd"
+                    },
+                    {
+                        "Type": "Log",
+                        "Name": "gcplogs"
+                    },
+                    {
+                        "Type": "Log",
+                        "Name": "gelf"
+                    },
+                    {
+                        "Type": "Log",
+                        "Name": "journald"
+                    },
+                    {
+                        "Type": "Log",
+                        "Name": "json-file"
+                    },
+                    {
+                        "Type": "Log",
+                        "Name": "local"
+                    },
+                    {
+                        "Type": "Log",
+                        "Name": "logentries"
+                    },
+                    {
+                        "Type": "Log",
+                        "Name": "splunk"
+                    },
+                    {
+                        "Type": "Log",
+                        "Name": "syslog"
+                    },
+                    {
+                        "Type": "Network",
+                        "Name": "bridge"
+                    },
+                    {
+                        "Type": "Network",
+                        "Name": "host"
+                    },
+                    {
+                        "Type": "Network",
+                        "Name": "ipvlan"
+                    },
+                    {
+                        "Type": "Network",
+                        "Name": "macvlan"
+                    },
+                    {
+                        "Type": "Network",
+                        "Name": "null"
+                    },
+                    {
+                        "Type": "Network",
+                        "Name": "overlay"
+                    },
+                    {
+                        "Type": "Volume",
+                        "Name": "local"
+                    }
+                ]
+            },
+            "TLSInfo": {
+                "TrustRoot": "-----BEGIN CERTIFICATE-----\nMIIBaTCCARCgAwIBAgIUQggmYwlT2zuRjSyFSF6HNBNSXR4wCgYIKoZIzj0EAwIw\nEzERMA8GA1UEAxMIc3dhcm0tY2EwHhcNMjAwNTIzMTM0MTAwWhcNNDAwNTE4MTM0\nMTAwWjATMREwDwYDVQQDEwhzd2FybS1jYTBZMBMGByqGSM49AgEGCCqGSM49AwEH\nA0IABEowDjRR1Utw2fOdxpha1sAqxQH8Z8GOnTmWZ6xsn9fbMwxxqnNv+CNQXYSk\neiGMZF6lOiZLNKm3k/0wspu9VH+jQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMB\nAf8EBTADAQH/MB0GA1UdDgQWBBRB7nVge2tUl8df3icIsgB0Y7PA0jAKBggqhkjO\nPQQDAgNHADBEAiBAutd+pqm7upVterNyF9hNb7S/GxfkImwP2BTmPIOc9gIgUA4D\nTBsp0BxYT3qyagyL1KL8R2DSL3g8BUpFMT93HY8=\n-----END CERTIFICATE-----\n",
+                "CertIssuerSubject": "MBMxETAPBgNVBAMTCHN3YXJtLWNh",
+                "CertIssuerPublicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAESjAONFHVS3DZ853GmFrWwCrFAfxnwY6dOZZnrGyf19szDHGqc2/4I1BdhKR6IYxkXqU6Jks0qbeT/TCym71Ufw=="
+            }
+        },
+        "Status": {
+            "State": "ready",
+            "Addr": "10.128.0.9"
+        },
+        "ManagerStatus": {
+            "Leader": true,
+            "Reachability": "reachable",
+            "Addr": "10.128.0.9:2377"
+        }
+    }
+]
+docker ps -a
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+docker images
+REPOSITORY                   TAG                 IMAGE ID            CREATED             SIZE
+multiarch/qemu-user-static   latest              e623c77ba49d        4 weeks ago         130MB
+docker pull docker.io/******/mysql:5.7.30-linux-arm64v8
+5.7.30-linux-arm64v8: Pulling from ******/mysql
+
+c2cd007b69f7: Pulling fs layer 
+3c087f8bf83d: Pulling fs layer 
+474b5c43e9a2: Pulling fs layer 
+7083e6591d76: Pulling fs layer 
+366f09f8071f: Pulling fs layer 
+6d83c8896db8: Pulling fs layer 
+bf113cd28558: Pulling fs layer 
+163408b07d4f: Pulling fs layer 
+2f725b95379c: Pulling fs layer 
+2cbc4fdaa2fe: Pulling fs layer 
+ac2348a6887a: Pulling fs layer 
+249d3849e591: Pulling fs layer 
+0d2f595ae098: Pulling fs layer 7083e6591d76: Waiting 366f09f8071f: Waiting 6d83c8896db8: Waiting 2cbc4fdaa2fe: Waiting ac2348a6887a: Waiting bf113cd28558: Waiting 249d3849e591: Waiting 0d2f595ae098: Waiting 163408b07d4f: Waiting 2f725b95379c: Waiting 474b5c43e9a2: Downloading     425B/849B474b5c43e9a2: Download complete 3c087f8bf83d: Downloading     423B/35.2kB3c087f8bf83d: Verifying Checksum 3c087f8bf83d: Download complete c2cd007b69f7: Downloading  244.8kB/23.72MBc2cd007b69f7: Downloading  9.313MB/23.72MB366f09f8071f: Downloading     426B/1.879kB366f09f8071f: Downloading  1.879kB/1.879kB366f09f8071f: Download complete 7083e6591d76: Downloading     189B/189B7083e6591d76: Verifying Checksum 7083e6591d76: Download complete c2cd007b69f7: Downloading   19.8MB/23.72MBc2cd007b69f7: Verifying Checksum c2cd007b69f7: Download complete c2cd007b69f7: Extracting  262.1kB/23.72MBc2cd007b69f7: Extracting  1.835MB/23.72MBbf113cd28558: Downloading     149B/149Bbf113cd28558: Verifying Checksum bf113cd28558: Download complete 6d83c8896db8: Downloading  46.91kB/4.635MB163408b07d4f: Downloading  105.8kB/10.28MBc2cd007b69f7: Extracting  4.456MB/23.72MB6d83c8896db8: Downloading  4.635MB/4.635MB6d83c8896db8: Verifying Checksum 6d83c8896db8: Download complete 163408b07d4f: Downloading  2.989MB/10.28MBc2cd007b69f7: Extracting  6.554MB/23.72MB2f725b95379c: Downloading  507.9kB/50.31MB163408b07d4f: Downloading  8.829MB/10.28MB163408b07d4f: Verifying Checksum 163408b07d4f: Download complete c2cd007b69f7: Extracting  7.864MB/23.72MB2f725b95379c: Downloading  7.121MB/50.31MB2cbc4fdaa2fe: Downloading     426B/5.146kB2cbc4fdaa2fe: Downloading  5.146kB/5.146kB2cbc4fdaa2fe: Verifying Checksum 2cbc4fdaa2fe: Download complete c2cd007b69f7: Extracting  9.699MB/23.72MB2f725b95379c: Downloading  17.34MB/50.31MBac2348a6887a: Downloading     426B/5.185kBac2348a6887a: Downloading  5.185kB/5.185kBac2348a6887a: Verifying Checksum ac2348a6887a: Download complete c2cd007b69f7: Extracting   11.8MB/23.72MB2f725b95379c: Downloading  25.49MB/50.31MBc2cd007b69f7: Extracting  13.63MB/23.72MB249d3849e591: Downloading  9.965kB/927.9kB2f725b95379c: Downloading  33.15MB/50.31MB249d3849e591: Downloading  927.9kB/927.9kB249d3849e591: Verifying Checksum 249d3849e591: Download complete c2cd007b69f7: Extracting  14.94MB/23.72MB2f725b95379c: Downloading  40.29MB/50.31MB0d2f595ae098: Downloading     426B/1.586kB0d2f595ae098: Downloading  1.586kB/1.586kB0d2f595ae098: Verifying Checksum 0d2f595ae098: Download complete c2cd007b69f7: Extracting   17.3MB/23.72MB2f725b95379c: Verifying Checksum 2f725b95379c: Download complete c2cd007b69f7: Extracting  20.45MB/23.72MBc2cd007b69f7: Extracting  21.76MB/23.72MBc2cd007b69f7: Extracting  23.33MB/23.72MBc2cd007b69f7: Extracting  23.72MB/23.72MBc2cd007b69f7: Pull complete 3c087f8bf83d: Extracting  32.77kB/35.2kB3c087f8bf83d: Extracting   35.2kB/35.2kB3c087f8bf83d: Pull complete 474b5c43e9a2: Extracting     849B/849B474b5c43e9a2: Extracting     849B/849B474b5c43e9a2: Pull complete 7083e6591d76: Extracting     189B/189B7083e6591d76: Extracting     189B/189B7083e6591d76: Pull complete 366f09f8071f: Extracting  1.879kB/1.879kB366f09f8071f: Extracting  1.879kB/1.879kB366f09f8071f: Pull complete 6d83c8896db8: Extracting  65.54kB/4.635MB6d83c8896db8: Extracting  589.8kB/4.635MB6d83c8896db8: Extracting  4.325MB/4.635MB6d83c8896db8: Extracting  4.635MB/4.635MB6d83c8896db8: Extracting  4.635MB/4.635MB6d83c8896db8: Pull complete bf113cd28558: Extracting     149B/149Bbf113cd28558: Extracting     149B/149Bbf113cd28558: Pull complete 163408b07d4f: Extracting  131.1kB/10.28MB163408b07d4f: Extracting  1.442MB/10.28MB163408b07d4f: Extracting  2.621MB/10.28MB163408b07d4f: Extracting  5.112MB/10.28MB163408b07d4f: Extracting  6.554MB/10.28MB163408b07d4f: Extracting  7.864MB/10.28MB163408b07d4f: Extracting  9.568MB/10.28MB163408b07d4f: Extracting  10.22MB/10.28MB163408b07d4f: Extracting  10.28MB/10.28MB163408b07d4f: Pull complete 2f725b95379c: Extracting  524.3kB/50.31MB2f725b95379c: Extracting   3.67MB/50.31MB2f725b95379c: Extracting   7.34MB/50.31MB2f725b95379c: Extracting  10.49MB/50.31MB2f725b95379c: Extracting  14.16MB/50.31MB2f725b95379c: Extracting   17.3MB/50.31MB2f725b95379c: Extracting  20.45MB/50.31MB2f725b95379c: Extracting  23.59MB/50.31MB2f725b95379c: Extracting  26.74MB/50.31MB2f725b95379c: Extracting  29.88MB/50.31MB2f725b95379c: Extracting  33.55MB/50.31MB2f725b95379c: Extracting  37.22MB/50.31MB2f725b95379c: Extracting  40.37MB/50.31MB2f725b95379c: Extracting  44.04MB/50.31MB2f725b95379c: Extracting  47.71MB/50.31MB2f725b95379c: Extracting  49.81MB/50.31MB2f725b95379c: Extracting  50.31MB/50.31MB2f725b95379c: Extracting  50.31MB/50.31MB2f725b95379c: Pull complete 2cbc4fdaa2fe: Extracting  5.146kB/5.146kB2cbc4fdaa2fe: Extracting  5.146kB/5.146kB2cbc4fdaa2fe: Pull complete ac2348a6887a: Extracting  5.185kB/5.185kBac2348a6887a: Extracting  5.185kB/5.185kBac2348a6887a: Pull complete 249d3849e591: Extracting  32.77kB/927.9kB249d3849e591: Extracting  294.9kB/927.9kB249d3849e591: Extracting  491.5kB/927.9kB249d3849e591: Extracting  927.9kB/927.9kB249d3849e591: Extracting  927.9kB/927.9kB249d3849e591: Pull complete 0d2f595ae098: Extracting  1.586kB/1.586kB0d2f595ae098: Extracting  1.586kB/1.586kB0d2f595ae098: Pull complete Digest: sha256:f0e1d88ce71a2d10e362f457cef8ade70e3803ff14a6b7f84926d5938f4d23ee
+Status: Downloaded newer image for ******/mysql:5.7.30-linux-arm64v8
+docker.io/******/mysql:5.7.30-linux-arm64v8
+docker image inspect docker.io/******/mysql:5.7.30-linux-arm64v8
+[
+    {
+        "Id": "sha256:4f00dec165f128a77522980b2ae283cd7cd1ac6225e523517db74c6ea8ac1554",
+        "RepoTags": [
+            "******/mysql:5.7.30-linux-arm64v8"
+        ],
+        "RepoDigests": [
+            "******/mysql@sha256:f0e1d88ce71a2d10e362f457cef8ade70e3803ff14a6b7f84926d5938f4d23ee"
+        ],
+        "Parent": "",
+        "Comment": "",
+        "Created": "2020-05-22T19:28:39.138519122Z",
+        "Container": "acd798745af9f66a9737b65acdb28d394b33a92812340a9eb260af815b9cce66",
+        "ContainerConfig": {
+            "Hostname": "acd798745af9",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "3306/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "GOSU_VERSION=1.12",
+                "MYSQL_MAJOR=5.7"
+            ],
+            "Cmd": [
+                "/bin/sh",
+                "-c",
+                "#(nop) ",
+                "LABEL org.label-schema.build-date=2020-05-22T19:25:25Z org.label-schema.vcs-ref=019a310 org.label-schema.vcs-url=https://github.com/******/mysql"
+            ],
+            "Image": "sha256:50326780a617e012b8ce895ee52361a90a9c79bee868712875a400ca16d31402",
+            "Volumes": {
+                "/var/lib/mysql": {}
+            },
+            "WorkingDir": "",
+            "Entrypoint": [
+                "/usr/local/bin/docker-entrypoint.sh"
+            ],
+            "OnBuild": null,
+            "Labels": {
+                "org.label-schema.build-date": "2020-05-22T19:25:25Z",
+                "org.label-schema.vcs-ref": "019a310",
+                "org.label-schema.vcs-url": "https://github.com/******/mysql"
+            }
+        },
+        "DockerVersion": "19.03.9",
+        "Author": "Brother In Arms <project.******@gmail.com>",
+        "Config": {
+            "Hostname": "",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "3306/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "GOSU_VERSION=1.12",
+                "MYSQL_MAJOR=5.7"
+            ],
+            "Cmd": [
+                "mysqld"
+            ],
+            "Image": "sha256:50326780a617e012b8ce895ee52361a90a9c79bee868712875a400ca16d31402",
+            "Volumes": {
+                "/var/lib/mysql": {}
+            },
+            "WorkingDir": "",
+            "Entrypoint": [
+                "/usr/local/bin/docker-entrypoint.sh"
+            ],
+            "OnBuild": null,
+            "Labels": {
+                "org.label-schema.build-date": "2020-05-22T19:25:25Z",
+                "org.label-schema.vcs-ref": "019a310",
+                "org.label-schema.vcs-url": "https://github.com/******/mysql"
+            }
+        },
+        "Architecture": "arm64",
+        "Os": "linux",
+        "Size": 266453618,
+        "VirtualSize": 266453618,
+        "GraphDriver": {
+            "Data": null,
+            "Name": "aufs"
+        },
+        "RootFS": {
+            "Type": "layers",
+            "Layers": [
+                "sha256:2e95f1db4570b6afb86ab045946ae08258e6fa441dff3c1f203c16e144d8d16d",
+                "sha256:ccf35b27430d91d07564e70d2ea340563697e4a91dfe03c40675d906bd7059a2",
+                "sha256:f0a302c91d12daa5f4d7a8ca4e3b66464190f53539cc36f6b1c15d6c09894d65",
+                "sha256:307fb5586e3d8e2da3ad3e01f1fe9637af6efb8e21522dedd92cfd9909695941",
+                "sha256:2e5f50b579cb6a8d67ebc85f5ff25196531e9747803e45bb78d86a2ff3aa65ac",
+                "sha256:f844ae8f369d0a2f30667ce62e76d13d5153c927d1f1fd84cf1b53d0a2fd0c02",
+                "sha256:76fae1e1fee4b667ea17be224f27548f531d72a316c4f51ee5fba8890ece641a",
+                "sha256:6d7a6455c228c107caf71a1e42af50cb044726e737461b8f832fe151f7635e79",
+                "sha256:f421c790bdec9320d50c299e8104a26187b47d81bc531d5a5e1b3609d619638e",
+                "sha256:adb28efb7b63de7a716fcde75ce9f3e0dd7f4cff10ef89f002e80ad3398cae54",
+                "sha256:65bc41d3b960c6b2a66d3ba6e1e4f3a8b4d84db6c3f94a96f74eddcf876698a8",
+                "sha256:c40f230c191051aa07a9127459b1026faa5bf6d18e139ba7ba64fe7ba62431fa",
+                "sha256:1a2aff097e437ddf3e9a3478192243b65be786131a7971851d17ff6dd635423c"
+            ]
+        },
+        "Metadata": {
+            "LastTagTime": "0001-01-01T00:00:00Z"
+        }
+    }
+]
+docker service rm mysql-test2 || true
+Error: No such service: mysql-test2
+docker secret rm mysql-test2-secret || true
+Error: No such secret: mysql-test2-secret
+printf "dummy_password" | docker secret create mysql-test2-secret -
+vns9bwidifdblydtz9rchbcuq
+docker service create --name mysql-test2 --secret mysql-test2-secret -e MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql-test2-secret -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD_FILE=/run/secrets/mysql-test2-secret docker.io/******/mysql:5.7.30-linux-arm64v8
+uivxjg4c61o8wndg8irl9rqm0
+
+overall progress: 0 out of 1 tasks 
+1/1:   1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks 1/1: no suitable node (unsupported platform on 1 node) overall progress: 0 out of 1 tasks Makefile:40: recipe for target 'test-tc-2' failed
+make: *** [test-tc-2] Terminated
+
+
+Build was canceled

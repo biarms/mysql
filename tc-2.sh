@@ -11,7 +11,7 @@ run-tc2() {
 	docker secret rm mysql-test2-secret 2>/dev/null || true
 	printf "dummy_password" | docker secret create mysql-test2-secret -
 	echo "Launch the service in background to be able to analyse the service..."
-	docker service create -d --name mysql-test2 --secret mysql-test2-secret -e MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql-test2-secret -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD_FILE=/run/secrets/mysql-test2-secret "${image_to_test}"
+	docker service create --name mysql-test2 --secret mysql-test2-secret -e MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql-test2-secret -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD_FILE=/run/secrets/mysql-test2-secret "${image_to_test}" &
 	i=0
 	timeout=0
 	result=0
@@ -25,7 +25,7 @@ run-tc2() {
 	  fi
 	  i=$[$i+1]
 	  echo "i:$i"
-	  if [ $i -gt 10 ]; then
+	  if [ $i -gt 30 ]; then
 	    timeout=1
 	  	echo "Timeout !!! TC will fail (after service inspection and cleanup...)"
 	  	break
@@ -37,7 +37,7 @@ run-tc2() {
 	# Diff between Travis and CircleCI: the 'Architecture' is set for CircleCI, but not for Travis !
 	echo "Service architecture:"
 	docker service inspect mysql-test2 | grep "Architecture" || true
-	#docker service logs mysql-test2
+	docker service logs mysql-test2 || true
 	echo "service cleanup"
 	docker service rm mysql-test2
 	docker secret rm mysql-test2-secret
