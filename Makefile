@@ -5,7 +5,7 @@ DOCKER_IMAGE_NAME = biarms/mysql
 ARCH = arm64v8
 DOCKER_IMAGE_VERSION = 5.7.30
 
-DOCKER_IMAGE_TAGNAME = $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)-linux-$(ARCH)
+DOCKER_IMAGE_TAGNAME = $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)-linux-$(ARCH)-issue-03
 
 default: test-tc-2
 
@@ -43,8 +43,8 @@ debug-env:
 	docker ps -a
 	docker service ls
 	# docker images
-	docker pull ${DOCKER_IMAGE_TAGNAME}
-	docker image inspect ${DOCKER_IMAGE_TAGNAME}
+	docker pull "${DOCKER_IMAGE_TAGNAME}"
+	docker image inspect "${DOCKER_IMAGE_TAGNAME}"
 
 test-tc-2: install-qemu setup-swarm debug-env
 	TRACE=on bash tc-2.sh "${DOCKER_IMAGE_TAGNAME}"
