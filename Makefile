@@ -138,7 +138,7 @@ create-and-push-manifests: #ideally, should reference 'check-docker-login' and '
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_5_5}${BETA_VERSION}" "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_5_5}-linux-arm64v8${BETA_VERSION}" --os linux --arch arm64 --variant v8
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_5_5}${BETA_VERSION}" "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_5_5}-linux-amd64${BETA_VERSION}" --os linux --arch amd64
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_5_5}${BETA_VERSION}"
-	# biarms/mysql:5.7.30 # It is a good idea to push this one at the end...
+	# biarms/mysql:5.7.32 # It is a good idea to push this one at the end...
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create --amend "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}"
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" --os linux --arch arm --variant v7
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" --os linux --arch arm64 --variant v8
@@ -172,7 +172,7 @@ test-manifests:
 	test $$(docker run --rm mplatform/mquery "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_5_5}${BETA_VERSION}" | grep linux | wc -l | xargs) = 3
 	test $$(docker run --rm mplatform/mquery "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_5_5}${BETA_VERSION}" | grep -c "arm/v6") = 0
 	test $$(docker run --rm mplatform/mquery "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_5_5}${BETA_VERSION}" | grep -c "arm/v7") = 1
-	# Same kind of tests of biarms/mysql:5.7.30
+	# Same kind of tests of biarms/mysql:5.7.33
 	test $$(docker run --rm mplatform/mquery "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" | grep linux | wc -l | xargs) = 3
 	test $$(docker run --rm mplatform/mquery "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" | grep -c "arm/v6") = 0
 	test $$(docker run --rm mplatform/mquery "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" | grep -c "arm/v7") = 1
