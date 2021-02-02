@@ -1,16 +1,11 @@
+# Original version was inspired by https://github.com/hypriot/rpi-mysql/blob/master/Makefile
+
 SHELL = bash
 # .ONESHELL:
 # .SHELLFLAGS = -e
 # See https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html
-.PHONY: default all build circleci-local-build check-binaries check-buildx check-docker-login docker-login-if-possible buildx-prepare \
+.PHONY: default all build circleci-local-build check-binaries check-docker-login docker-login-if-possible buildx-prepare \
         buildx * TODO
-
-## Caution: this Makefile has 'multiple entries', which means that it is 'calling himself'.
-# For instance, if you call 'make circleci-local-build':
-# 1. CircleCi cli is invoked
-# 2. After have installed a build environment (inside a docker container), CircleCI will call "make" without parameter, which correspond to a 'make build-all-images' build (because of default target)
-# 3. And 'build-all-images' target will run 4 times the "make all-one-image" for 4 different architecture (arm32v6, arm32v7, arm64v8 and amd64).
-# Inspired from https://github.com/hypriot/rpi-mysql/blob/master/Makefile
 
 # DOCKER_REGISTRY: Nothing, or 'registry:5000/'
 DOCKER_REGISTRY ?= docker.io/
@@ -20,37 +15,25 @@ DOCKER_USERNAME ?=
 DOCKER_PASSWORD ?=
 # BETA_VERSION: Nothing, or '-beta-123'
 BETA_VERSION ?=
-DOCKER_IMAGE_NAME=biarms/mysql
+DOCKER_IMAGE_NAME = biarms/mysql
 DOCKER_IMAGE_VERSION ?=
 MYSQL_VERSION_ARM32V6 = 5.5.60
 MYSQL_VERSION_5_5 = 5.5.62
-MYSQL_VERSION_OTHER_ARCH = 5.7.30
+MYSQL_VERSION_OTHER_ARCH = 5.7.33
 DOCKER_FILE ?=
-DOCKER_IMAGE_TAGNAME = $(DOCKER_REGISTRY)$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_VERSION)-linux-$(ARCH)$(BETA_VERSION)
+DOCKER_IMAGE_TAGNAME = ${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}${BETA_VERSION}
 # See https://www.gnu.org/software/make/manual/html_node/Shell-Function.html
 BUILD_DATE=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 # See https://microbadger.com/labels
 VCS_REF=$(shell git rev-parse --short HEAD)
 
-ARCH ?= arm64v8
-LINUX_ARCH ?= aarch64
-BUILD_ARCH = $(ARCH)/
-
-# See https://github.com/docker-library/official-images#architectures-other-than-amd64
-# |---------|------------|
-# |  ARCH   | LINUX_ARCH |
-# |---------|------------|
-# |  amd64  |   x86_64   |
-# | arm32v6 |   armv6l   |
-# | arm32v7 |   armv7l   |
-# | arm64v8 |   aarch64  |
-# |---------|------------|
-
 default: all
 
-all: check-docker-login build all-manifests generate-test-suite
+all: check-docker-login build all-manifests generate-test-suite uninstall-qemu
 
 build: build-all-images
+
+test: test-all-images
 
 # Launch a local build as on circleci, that will call the default target, but inside the 'circleci build and test env'
 circleci-local-build: check-docker-login
@@ -66,8 +49,6 @@ check-binaries:
 	@ echo "DOCKER_REGISTRY: ${DOCKER_REGISTRY}"
 	@ echo "BUILD_DATE: ${BUILD_DATE}"
 	@ echo "VCS_REF: ${VCS_REF}"
-
-check-build: check-binaries
 	# Next line will fail if docker server can't be contacted
 	docker version
 
@@ -84,8 +65,6 @@ check-docker-login: check-binaries
 docker-login-if-possible: check-binaries
 	if [[ ! "${DOCKER_USERNAME}" == "" ]]; then echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin; fi
 
-prepare: check-build check install-qemu
-
 # Test are qemu based. SHOULD_DO: use `docker buildx bake`. See https://github.com/docker/buildx#buildx-bake-options-target
 install-qemu: check-binaries
 	# @ # From https://github.com/multiarch/qemu-user-static:
@@ -94,39 +73,8 @@ install-qemu: check-binaries
 uninstall-qemu: check-binaries
 	docker run --rm --privileged multiarch/qemu-user-static:register --reset
 
-check: check-binaries
-	@ if [[ "$(DOCKER_IMAGE_VERSION)" == "" ]]; then \
-	    echo 'DOCKER_IMAGE_VERSION is $(DOCKER_IMAGE_VERSION) (MUST BE SET !)' && \
-	    echo 'Correct usage sample: ' && \
-        echo '    ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=5.7.30 make' && \
-	    echo '    or ' && \
-        echo '    ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=5.7.30 make' && \
-        exit -1; \
-	fi
-	@ if [[ "$(ARCH)" == "" ]]; then \
-	    echo 'ARCH is $(ARCH) (MUST BE SET !)' && \
-	    echo 'Correct usage sample: ' && \
-        echo '    ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=5.7.30 make' && \
-	    echo '    or ' && \
-        echo '    ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=5.7.30 make' && \
-        exit -2; \
-	fi
-	@ if [[ "$(LINUX_ARCH)" == "" ]]; then \
-	    echo 'LINUX_ARCH is $(LINUX_ARCH) (MUST BE SET !)' && \
-	    echo 'Correct usage sample: ' && \
-	    echo '    ARCH=arm32v7 LINUX_ARCH=armv7l DOCKER_IMAGE_VERSION=5.7.30 make ' && \
-	    echo '    or ' && \
-        echo '    ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=5.7.30 make' && \
-        exit -3; \
-	fi
-	# Debug info
-	@ echo "DOCKER_IMAGE_TAGNAME: ${DOCKER_IMAGE_TAGNAME}"
-
 build-all-images: build-all-one-image-amd64     build-all-one-image-arm64v8     build-all-one-image-arm32v7     build-all-one-image-arm32v6 \
                   build-all-one-image-amd64-5.5 build-all-one-image-arm64v8-5.5 build-all-one-image-arm32v7-5.5 uninstall-qemu
-
-# Actually, the 'push' will only be done is DOCKER_USERNAME is set and not empty !
-build-all-one-image: prepare build-one-image test-one-image push-one-image
 
 build-all-one-image-arm32v6:
 	ARCH=arm32v6 LINUX_ARCH=armv6l  DOCKER_IMAGE_VERSION=${MYSQL_VERSION_ARM32V6} DOCKER_FILE='-f Dockerfile-5.5-arm32v6' make build-all-one-image
@@ -190,7 +138,7 @@ create-and-push-manifests: #ideally, should reference 'check-docker-login' and '
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_5_5}${BETA_VERSION}" "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_5_5}-linux-arm64v8${BETA_VERSION}" --os linux --arch arm64 --variant v8
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_5_5}${BETA_VERSION}" "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_5_5}-linux-amd64${BETA_VERSION}" --os linux --arch amd64
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest push "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_5_5}${BETA_VERSION}"
-	# biarms/mysql:5.7.30 # It is a good idea to push this one at the end...
+	# biarms/mysql:5.7.32 # It is a good idea to push this one at the end...
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest create --amend "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-amd64${BETA_VERSION}"
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm32v7${BETA_VERSION}" --os linux --arch arm --variant v7
 	DOCKER_CLI_EXPERIMENTAL=enabled docker manifest annotate "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" "${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}-linux-arm64v8${BETA_VERSION}" --os linux --arch arm64 --variant v8
@@ -224,7 +172,7 @@ test-manifests:
 	test $$(docker run --rm mplatform/mquery "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_5_5}${BETA_VERSION}" | grep linux | wc -l | xargs) = 3
 	test $$(docker run --rm mplatform/mquery "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_5_5}${BETA_VERSION}" | grep -c "arm/v6") = 0
 	test $$(docker run --rm mplatform/mquery "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_5_5}${BETA_VERSION}" | grep -c "arm/v7") = 1
-	# Same kind of tests of biarms/mysql:5.7.30
+	# Same kind of tests of biarms/mysql:5.7.33
 	test $$(docker run --rm mplatform/mquery "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" | grep linux | wc -l | xargs) = 3
 	test $$(docker run --rm mplatform/mquery "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" | grep -c "arm/v6") = 0
 	test $$(docker run --rm mplatform/mquery "${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION}" | grep -c "arm/v7") = 1
@@ -281,26 +229,110 @@ generate-test-suite:
 	@ echo "docker run --rm ${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${MYSQL_VERSION_OTHER_ARCH}${BETA_VERSION} sh -c 'cat /etc/*release'" >> testSuite.sh
 	echo "Done. See the file 'testSuite.sh'"
 
-build-one-image: check
-	docker build -t ${DOCKER_IMAGE_TAGNAME} --build-arg VERSION="${DOCKER_IMAGE_VERSION}" --build-arg VCS_REF="${VCS_REF}" --build-arg BUILD_DATE="${BUILD_DATE}" --build-arg BUILD_ARCH="${BUILD_ARCH}" ${DOCKER_FILE} .
+# Fails with: "standard_init_linux.go:211: exec user process caused "no such file or directory"" if qemu is not installed...
+test-all-images: test-arm32v6 test-arm32v7-5.5 test-arm32v7 test-arm64v8 test-amd64
+	echo "All tests are OK :)"
 
-test-one-image: check
+test-arm32v6:
+	ARCH=arm32v6 LINUX_ARCH=armv6l  DOCKER_IMAGE_VERSION=${MYSQL_VERSION_ARM32V6} DOCKER_FILE='-f Dockerfile-5.5-arm32v6' make test-one-image
+
+test-arm32v7-5.5:
+	ARCH=arm32v7 LINUX_ARCH=armv7l  DOCKER_IMAGE_VERSION=${MYSQL_VERSION_5_5} DOCKER_FILE='-f Dockerfile-5.5' make test-one-image
+
+test-arm32v7:
+	ARCH=arm32v7 LINUX_ARCH=armv7l  DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make test-one-image
+
+test-arm64v8-5.5:
+	ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=${MYSQL_VERSION_5_5} DOCKER_FILE='-f Dockerfile-5.5' make test-one-image
+
+test-arm64v8:
+	ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make test-one-image
+
+run-tc-2-for-arm64v8:
+	ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make run-tc-02
+
+test-amd64:
+	ARCH=amd64   LINUX_ARCH=x86_64  DOCKER_IMAGE_VERSION=${MYSQL_VERSION_OTHER_ARCH} make test-one-image
+
+test-amd64-5.5:
+	ARCH=amd64   LINUX_ARCH=x86_64  DOCKER_IMAGE_VERSION=${MYSQL_VERSION_5_5} DOCKER_FILE='-f Dockerfile-5.5' make test-one-image
+
+## Caution: this Makefile has 'multiple entries', which means that it is 'calling himself'.
+# For instance, if you call 'make circleci-local-build':
+# 1. CircleCi cli is invoked
+# 2. After have installed a build environment (inside a docker container), CircleCI will call "make" without parameter, which correspond to a 'make all' build (because of default target)
+# 3. And the 'all' target will run 4 times the "make all-one-image" for 4 different architecture (arm32v6, arm32v7, arm64v8 and amd64), via the 'build-all-images' target.
+# See https://github.com/docker-library/official-images#architectures-other-than-amd64
+# |---------|------------|
+# |  ARCH   | LINUX_ARCH |
+# |---------|------------|
+# |  amd64  |   x86_64   |
+# | arm32v6 |   armv6l   |
+# | arm32v7 |   armv7l   |
+# | arm64v8 |   aarch64  |
+# |---------|------------|
+ARCH ?= arm64v8
+LINUX_ARCH ?= aarch64
+BUILD_ARCH = $(ARCH)/
+MULTI_ARCH_DOCKER_IMAGE_TAGNAME = ${DOCKER_REGISTRY}${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}-linux-${ARCH}${BETA_VERSION}
+
+## Multi-arch targets
+
+# Actually, the 'push' will only be done is DOCKER_USERNAME is set and not empty !
+build-all-one-image: build-one-image test-one-image push-one-image
+
+check: check-binaries
+	@ if [[ "$(ARCH)" == "" ]]; then \
+	    echo 'ARCH is $(ARCH) (MUST BE SET !)' && \
+	    echo 'Correct usage sample: ' && \
+        echo '    ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=1.2.3 make test-one-image' && \
+	    echo '    or ' && \
+        echo '    ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=1.2.3 make test-one-image' && \
+        exit -1; \
+	fi
+	@ if [[ "$(LINUX_ARCH)" == "" ]]; then \
+	    echo 'LINUX_ARCH is $(LINUX_ARCH) (MUST BE SET !)' && \
+	    echo 'Correct usage sample: ' && \
+	    echo '    ARCH=arm32v7 LINUX_ARCH=armv7l DOCKER_IMAGE_VERSION=1.2.3 make test-one-image' && \
+	    echo '    or ' && \
+        echo '    ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=1.2.3 make test-one-image' && \
+        exit -2; \
+	fi
+	@ if [[ "$(DOCKER_IMAGE_VERSION)" == "" ]]; then \
+	    echo 'DOCKER_IMAGE_VERSION is $(DOCKER_IMAGE_VERSION) (MUST BE SET !)' && \
+	    echo 'Correct usage sample: ' && \
+        echo '    ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=1.2.3 make test-one-image' && \
+	    echo '    or ' && \
+        echo '    ARCH=arm64v8 LINUX_ARCH=aarch64 DOCKER_IMAGE_VERSION=1.2.3 make test-one-image' && \
+        exit -3; \
+	fi
+	# Debug info
+	@ echo "MULTI_ARCH_DOCKER_IMAGE_TAGNAME: ${MULTI_ARCH_DOCKER_IMAGE_TAGNAME}"
+
+prepare: check install-qemu
+
+build-one-image: prepare
+	docker build -t "${MULTI_ARCH_DOCKER_IMAGE_TAGNAME}" --build-arg VERSION="${DOCKER_IMAGE_VERSION}" --build-arg VCS_REF="${VCS_REF}" --build-arg BUILD_DATE="${BUILD_DATE}" --build-arg BUILD_ARCH="${BUILD_ARCH}" ${DOCKER_FILE} .
+
+run-smoke-tests: prepare
 	# Smoke tests:
-	docker run --rm ${DOCKER_IMAGE_TAGNAME} /bin/echo "Success."
-	docker run --rm ${DOCKER_IMAGE_TAGNAME} uname -a
-	docker run --rm ${DOCKER_IMAGE_TAGNAME} mysql --version
-	docker run --rm ${DOCKER_IMAGE_TAGNAME} uname -a | grep "${LINUX_ARCH}"
-	docker run --rm ${DOCKER_IMAGE_TAGNAME} mysql --version | grep mysql
-	docker run --rm ${DOCKER_IMAGE_TAGNAME} mysqld --version | grep mysql
-	docker run --rm ${DOCKER_IMAGE_TAGNAME} mysql --version | grep "${DOCKER_IMAGE_VERSION}"
-	docker run --rm ${DOCKER_IMAGE_TAGNAME} mysqld --version | grep "${DOCKER_IMAGE_VERSION}"
+	docker run --rm "${MULTI_ARCH_DOCKER_IMAGE_TAGNAME}" /bin/echo "Success." | grep "Success"
+	docker run --rm "${MULTI_ARCH_DOCKER_IMAGE_TAGNAME}" uname -a
+	docker run --rm "${MULTI_ARCH_DOCKER_IMAGE_TAGNAME}" uname -a | grep "${LINUX_ARCH}"
+	docker run --rm "${MULTI_ARCH_DOCKER_IMAGE_TAGNAME}" mysql --version
+	docker run --rm "${MULTI_ARCH_DOCKER_IMAGE_TAGNAME}" mysql --version | grep mysql
+	docker run --rm "${MULTI_ARCH_DOCKER_IMAGE_TAGNAME}" mysqld --version | grep mysql
+	docker run --rm "${MULTI_ARCH_DOCKER_IMAGE_TAGNAME}" mysql --version | grep "${DOCKER_IMAGE_VERSION}"
+	docker run --rm "${MULTI_ARCH_DOCKER_IMAGE_TAGNAME}" mysqld --version | grep "${DOCKER_IMAGE_VERSION}"
 	# on armv6l, it will return 'armv7l'...
 	# docker run --rm ${DOCKER_IMAGE_NAME} mysql --version | grep "${LINUX_ARCH}"
 	# docker run --rm ${DOCKER_IMAGE_NAME} mysqld --version | grep "${LINUX_ARCH}"
+
+run-tc-01: prepare
 	# Test Case 1: test that MYSQL starts
 	docker stop mysql-test || true
 	docker rm mysql-test || true
-	docker create --name mysql-test -e MYSQL_ROOT_PASSWORD=root_password -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD=testpassword ${DOCKER_IMAGE_TAGNAME}
+	docker create --name mysql-test -e MYSQL_ROOT_PASSWORD=root_password -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD=testpassword ${MULTI_ARCH_DOCKER_IMAGE_TAGNAME}
 	docker start mysql-test
 	# wait for port 3306 to be ready
 	# netstat -tulpn | grep LISTEN | grep 3306
@@ -309,6 +341,8 @@ test-one-image: check
 	# docker run --rm -it --link mysql-test ${DOCKER_IMAGE_NAME} bash -c 'sleep 1 && mysql -h mysql-test -u testuser -ptestpassword -e "show variables;" testdb'
 	docker stop mysql-test
 	docker rm mysql-test
+
+run-tc-02: prepare
 	# Test Case 2: test that it is possible to use "xxx_FILE" syntax
 	docker swarm init || true
 	docker service rm mysql-test2 || true
@@ -318,25 +352,26 @@ test-one-image: check
 	# rm -rf tmp || true
 	# mkdir tmp
 	# echo "dummy_password" > tmp/password_file
-	# docker create --name mysql-test2 -v `pwd`/tmp/password_file:/tmp/root_password_file -v `pwd`/tmp/password_file:/tmp/user_password_file -e MYSQL_ROOT_PASSWORD_FILE=/tmp/root_password_file -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD_FILE=/tmp/user_password_file ${DOCKER_IMAGE_TAGNAME}
-# The test of "biarms/mysql:5.7.30-linux-arm64v8-beta-circleci" produce a "no suitable node (unsupported platform on 1 node)" error, quite similar to https://github.com/docker/swarmkit/issues/2401..., but only on CircleCI. There is no issue on Travis !
-# Let's skip this tests globally :( . See https://github.com/biarms/mysql/issues/3
-#	printf "dummy_password" | docker secret create mysql-test2-secret -
-#	docker service create --name mysql-test2 --secret mysql-test2-secret -e MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql-test2-secret -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD_FILE=/run/secrets/mysql-test2-secret ${DOCKER_IMAGE_TAGNAME}
-#	while ! (docker service logs mysql-test2 2>&1 | grep 'ready for connections') ; do sleep 1; done
-#	docker service rm mysql-test2
-#	docker secret rm mysql-test2-secret
+	# docker create --name mysql-test2 -v `pwd`/tmp/password_file:/tmp/root_password_file -v `pwd`/tmp/password_file:/tmp/user_password_file -e MYSQL_ROOT_PASSWORD_FILE=/tmp/root_password_file -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD_FILE=/tmp/user_password_file ${MULTI_ARCH_DOCKER_IMAGE_TAGNAME}
+	printf "dummy_password" | docker secret create mysql-test2-secret -
+	docker service create --name mysql-test2 --secret mysql-test2-secret -e MYSQL_ROOT_PASSWORD_FILE=/run/secrets/mysql-test2-secret -e MYSQL_DATABASE=testdb -e MYSQL_USER=testuser -e MYSQL_PASSWORD_FILE=/run/secrets/mysql-test2-secret ${MULTI_ARCH_DOCKER_IMAGE_TAGNAME}
+	while ! (docker service logs mysql-test2 2>&1 | grep 'ready for connections') ; do sleep 1; done
+	docker service rm mysql-test2
+	docker secret rm mysql-test2-secret
 	#
 	docker ps -a
 	# rm -rf tmp
 
+# Disable tc-02 because of issue #3 :(
+test-one-image: build-one-image run-smoke-tests run-tc-01 # run-tc-02
+
 push-one-image: check docker-login-if-possible
 	# push only is 'DOCKER_USERNAME' (and hopefully DOCKER_PASSWORD) are set:
-	if [[ ! "${DOCKER_USERNAME}" == "" ]]; then docker push "${DOCKER_IMAGE_TAGNAME}"; fi
+	if [[ ! "${DOCKER_USERNAME}" == "" ]]; then docker push "${MULTI_ARCH_DOCKER_IMAGE_TAGNAME}"; fi
 
 # Helper targets
 rmi-one-image: check
-	docker rmi -f $(DOCKER_IMAGE_TAGNAME)
+	docker rmi -f "${MULTI_ARCH_DOCKER_IMAGE_TAGNAME}"
 
 rebuild-one-image: rmi-one-image build-one-image
 

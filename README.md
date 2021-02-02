@@ -56,28 +56,28 @@ Caution:
     Image: biarms/mysql:5
      * Supported platforms:
        - linux/arm/v6  # => mysql version 5.5.60
-       - linux/amd64   # => mysql version 5.7.30
-       - linux/arm64   # => mysql version 5.7.30
+       - linux/amd64   # => mysql version 5.7.33
+       - linux/arm64   # => mysql version 5.7.33
     ```
   In other words, `docker run -it --rm biarms/mysql:5 --version` will return:
     1. '5.5.60' on arm32v6 devices
     2. '5.5.60' on arm32v7 devices (because of our workaround about https://github.com/biarms/mysql/issues/4 issue)
-    3. '5.7.30' on arm64v8 devices
-    4. '5.7.30' on x86_64 devices
-- Be aware no arm32v6 image is build for the 5.7 and 5.7.30 releases ! In other words, `docker run --rm mplatform/mquery biarms/mysql:5.7.30` (as well as `docker run --rm mplatform/mquery biarms/mysql:5.7`) will return something similar to:
+    3. '5.7.33' on arm64v8 devices
+    4. '5.7.33' on x86_64 devices
+- Be aware no arm32v6 image is build for the 5.7 and 5.7.33 releases ! In other words, `docker run --rm mplatform/mquery biarms/mysql:5.7.33` (as well as `docker run --rm mplatform/mquery biarms/mysql:5.7`) will return something similar to:
     ``` 
-    Image: biarms/mysql:5.7.30
+    Image: biarms/mysql:5.7.33
      * Manifest List: Yes
      * Supported platforms:
-       - linux/amd64    # => mysql version 5.7.30
-       - linux/arm/v7   # => mysql version 5.7.30
-       - linux/arm64    # => mysql version 5.7.30
+       - linux/amd64    # => mysql version 5.7.33
+       - linux/arm/v7   # => mysql version 5.7.33
+       - linux/arm64    # => mysql version 5.7.33
     ```
-  Which means that `docker run -it --rm biarms/mysql:5.7 --version` (or `docker run -it --rm biarms/mysql:5.7.30 --version`) will return: 
+  Which means that `docker run -it --rm biarms/mysql:5.7 --version` (or `docker run -it --rm biarms/mysql:5.7.33 --version`) will return: 
     1. an error on arm32v6 devices (so it will not work on armv6 devices like rpi zero or rpi one)
-    2. '5.7.30' on arm32v7 devices (like Odroid, or rpi2, rpi3, rpi4 running a 32 bits OS)
-    3. '5.7.30' on arm64v8 devices (like rpi2, rpi3, rpi4 running a 64 bits OS)
-    4. '5.7.30' on x86_64 devices (like a MacOS, Linux or PC)
+    2. '5.7.33' on arm32v7 devices (like Odroid, or rpi2, rpi3, rpi4 running a 32 bits OS)
+    3. '5.7.33' on arm64v8 devices (like rpi2, rpi3, rpi4 running a 64 bits OS)
+    4. '5.7.33' on x86_64 devices (like a MacOS, Linux or PC)
 - However, as soon as you stay with 5.5, you should get something working on any device
     ``` 
        - linux/amd64    # => mysql version 5.5.62
@@ -102,13 +102,14 @@ Caution:
 |                                                 | *arm32v6* | *arm32v7*  | *arm64v8* | *amd64*  |
 |-------------------------------------------------|-----------|------------|-----------|----------|
 | `docker run --rm biarms/mysql --version`        |  5.5.60   | 5.5.60 (1) |  5.7.30   |  5.7.30  |
-| `docker run --rm biarms/mysql:5 --version`      |  5.5.60   | 5.5.60 (1) |  5.7.30   |  5.7.30  |
+| `docker run --rm biarms/mysql:5 --version`      |  5.5.60   | 5.5.60 (1) |  5.7.33   |  5.7.33  |
 | `docker run --rm biarms/mysql:5.5 --version`    |  5.5.60   | 5.5.60 (2) |  5.5.62   |  5.5.62  |
 | `docker run --rm biarms/mysql:5.5.62 --version` |   NOK     | 5.5.62     |  5.5.62   |  5.5.62  |
-| `docker run --rm biarms/mysql:5.7 --version`    |   NOK     | 5.7.30     |  5.7.30   |  5.7.30  |
+| `docker run --rm biarms/mysql:5.7 --version`    |   NOK     | 5.7.33     |  5.7.33   |  5.7.33  |
 | `docker run --rm biarms/mysql:5.7.30 --version` |   NOK     | 5.7.30     |  5.7.30   |  5.7.30  |
+| `docker run --rm biarms/mysql:5.7.33 --version` |   NOK     | 5.7.33     |  5.7.33   |  5.7.33  |
 
-- (1) Should be 5.7.30 (build for arm32v7), but is 5.5.60 (build of arm32v6) because of 'docker pull' issue. See https://github.com/biarms/mysql/issues/4 for more details.
+- (1) Should be 5.7.33 (build for arm32v7), but is 5.5.60 (build of arm32v6) because of 'docker pull' issue. See https://github.com/biarms/mysql/issues/4 for more details.
 - (2) Should be 5.5.62 (build for arm32v7), but is 5.5.60 (build of arm32v6) because of 'docker pull' issue. See https://github.com/biarms/mysql/issues/4 for more details.
 
 ### Architecture

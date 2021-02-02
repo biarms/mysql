@@ -1,9 +1,9 @@
 language: bash
 
-dist: bionic # On 20/05/2020, focal is still not listed on https://docs.travis-ci.com/user/reference/overview/ :(
+dist: focal # See available images on https://docs.travis-ci.com/user/reference/overview/
 
-env:
-  - DOCKER_CLI_EXPERIMENTAL=enabled
+#env:
+#  - DOCKER_CLI_EXPERIMENTAL=enabled
 
 before_install:
   - sudo rm -rf /var/lib/apt/lists/*
