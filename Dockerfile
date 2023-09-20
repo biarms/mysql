@@ -1,6 +1,7 @@
 # 1. Define args usable during the pre-build phase
 # BUILD_ARCH: the docker architecture, with a tailing '/'. For instance, "arm64v8/"
 ARG BUILD_ARCH
+ARG MYSQL_VERSION
 
 # Changed from original - end: don't inherit from debian:jessie, because mysql-server-5.7 don't exist on debian:jessie arm apt-get repo
 FROM ${BUILD_ARCH}ubuntu:bionic
@@ -53,7 +54,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # ENV MYSQL_VERSION 5.7.21-1debian8
 # Changed from original - end
 
-ENV MYSQL_VERSION 5.7.21-1ubuntu1
+ENV MYSQL_VERSION=${MYSQL_VERSION:-5.7.21-1ubuntu1} 
 
 # Changed from original - start: mysql-server is found in official ubuntu repo
 # RUN echo "deb http://repo.mysql.com/apt/debian/ jessie mysql-${MYSQL_MAJOR}" > /etc/apt/sources.list.d/mysql.list
