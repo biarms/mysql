@@ -1,6 +1,7 @@
 # 1. Define args usable during the pre-build phase
 # BUILD_ARCH: the docker architecture, with a tailing '/'. For instance, "arm64v8/"
 ARG BUILD_ARCH
+ARG MYSQL_VERSION=5.7.21-1ubuntu1
 
 # Changed from original - end: don't inherit from debian:jessie, because mysql-server-5.7 don't exist on debian:jessie arm apt-get repo
 FROM ${BUILD_ARCH}ubuntu:bionic
@@ -69,7 +70,7 @@ RUN { \
 		echo mysql-server mysql-server/remove-test-db select false; \
         # Changed from original - end
 	} | debconf-set-selections \
-	&& apt-get update && apt-get install -y "mysql-server" && rm -rf /var/lib/apt/lists/* \
+	&& apt-get update && apt-get install -y "mysql-server=${MYSQL_VERSION}" && rm -rf /var/lib/apt/lists/* \
 	&& rm -rf /var/lib/mysql && mkdir -p /var/lib/mysql /var/run/mysqld \
 	&& chown -R mysql:mysql /var/lib/mysql /var/run/mysqld \
 # ensure that /var/run/mysqld (used for socket and lock files) is writable regardless of the UID our mysqld instance ends up having at runtime
@@ -97,7 +98,7 @@ ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 # To solve this error message:
 # There were fatal errors during processing of zoneinfo directory
 # make: *** [test] Error 1
-RUN ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata && rm -rf /var/lib/apt/lists/*
+RUN ln -fs /usr/share/zoneinfo/Europe/Budapest /etc/localtime && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y tzdata && rm -rf /var/lib/apt/lists/*
 # Changed from original - end
 
 
