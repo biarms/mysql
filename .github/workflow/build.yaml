@@ -1,0 +1,33 @@
+name: CI  
+on: [push, pull_request]  
+  
+jobs:  
+  build:  
+    runs-on: ubuntu-18.04 # Equivalent to 'bionic' in Travis  
+  
+    steps:  
+    - name: Check out repository  
+      uses: actions/checkout@v4  
+  
+        # Add support for more platforms with QEMU (optional)
+        # https://github.com/docker/setup-qemu-action
+    -   name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+  
+    - name: Set up Docker Buildx  
+      uses: docker/setup-buildx-action@v3  
+  
+    - name: Login to GitHub Container Registry  
+      uses: docker/login-action@v3  
+      with:  
+        registry: ghcr.io  
+        username: ${{ github.actor }}  
+        password: ${{ secrets.GITHUB_TOKEN }}  
+  
+    - name: Build and push  
+      uses: docker/build-push-action@v5  
+      with:  
+        context: .  
+        platforms: linux/amd64,linux/arm64 # Add more platforms if needed  
+        push: true  
+        tags: ghcr.io/${{ github.repository }}:latest

@@ -6,7 +6,7 @@ ARG BUILD_ARCH
 FROM ${BUILD_ARCH}ubuntu:bionic
 # Changed from original - end
 # Changed from original - start: add one line to override the maintainer
-MAINTAINER Brother In Arms <project.biarms@gmail.com>
+MAINTAINER https://github.com/balazsap
 # Changed from original - end
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
@@ -113,4 +113,4 @@ ARG BUILD_DATE
 LABEL \
 	org.label-schema.build-date=${BUILD_DATE} \
 	org.label-schema.vcs-ref=${VCS_REF} \
-	org.label-schema.vcs-url="https://github.com/biarms/mysql"
+	org.label-schema.vcs-url="https://github.com/balazsap/mysql"
